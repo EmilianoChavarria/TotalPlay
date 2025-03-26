@@ -36,7 +36,7 @@ export const Login = () => {
         validationSchema,
         onSubmit: (values) => {
             console.log('Datos del formulario:', values);
-            navigate('/dashboard');
+            navigate('/dashboard/home');
         },
     });
 

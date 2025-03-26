@@ -13,7 +13,7 @@ export const Layout = ({ userRole = "admin" }) => {
             { name: "Reportes", link: "/dashboard/reports", icon: "pi pi-chart-bar" }
         ],
         seller: [
-            { name: "Dashboard", link: "/dashboard", icon: "pi pi-objects-column" },
+            { name: "Dashboard", link: "/dashboard/home", icon: "pi pi-objects-column" },
             { name: "Paquetes", link: "/dashboard/packages", icon: "pi pi-box" },
             { name: "Contratos", link: "/dashboard/contracts", icon: "pi pi-file" }
         ]

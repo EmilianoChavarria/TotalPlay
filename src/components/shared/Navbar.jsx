@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const Navbar = () => {
   return (
@@ -15,11 +16,13 @@ export const Navbar = () => {
           <span>Admin</span>
         </div>
         <div>
-          <i
-            className={`pi pi-sign-out mr-2`}
-            style={{ fontSize: '1.2rem' }}
-          />
-          <span>Logout</span>
+          <Link to='/'>
+            <i
+              className={`pi pi-sign-out mr-2`}
+              style={{ fontSize: '1.2rem' }}
+            />
+            <span>Logout</span>
+          </Link>
         </div>
       </div>
     </div>

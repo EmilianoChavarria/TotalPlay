@@ -1,5 +1,5 @@
 import React from 'react'
-import { DashboardCard } from '../../cards/DashboardCard'
+import { DashboardCard } from '../../../cards/DashboardCard'
 
 export const Dashboard = () => {
   return (

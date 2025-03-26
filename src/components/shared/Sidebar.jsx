@@ -31,6 +31,7 @@ export const Sidebar = ({ items }) => {
                 </div>
 
                 {items.map((item, index) => (
+                    
                     <Link
                         key={index}
                         to={item.link}
