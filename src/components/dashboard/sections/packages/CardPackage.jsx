@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const CardPackage = () => {
+export const CardPackage = ({ name, speed, quantity, price }) => {
     return (
         <div className='bg-white rounded-lg py-6 px-4 shadow-sm'>
             {/* Encabexado de la card */}

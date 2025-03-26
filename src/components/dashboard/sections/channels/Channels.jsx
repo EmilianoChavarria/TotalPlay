@@ -1,70 +1,117 @@
 import React, { useState } from 'react';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { InputText } from "primereact/inputtext";
+import { Dropdown } from 'primereact/dropdown';
 
 export const Channels = () => {
   const [channels, setChannels] = useState([
     {
       id: 1,
-      logo: "https://placehold.co/50x50",
-      name: "Channel 1",
-      category: "Category 1",
-      price: "$2999"
+      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Discovery_Kids_Logo_2021-Presente.webp",
+      name: "Discovery Kids",
+      category: "Niños",
     },
     {
       id: 2,
-      logo: "https://placehold.co/50x50",
-      name: "Channel 2",
-      category: "Category 2",
-      price: "$1999"
+      logo: "https://upload.wikimedia.org/wikipedia/commons/c/c0/Fox_Broadcasting_Company_logo_%282019%29.svg",
+      name: "Fox",
+      category: "Comedia",
+
     },
     {
       id: 3,
-      logo: "https://placehold.co/50x50",
-      name: "Channel 3",
-      category: "Category 3",
-      price: "$99"
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Televisa_Deportes_logo.png/1200px-Televisa_Deportes_logo.png",
+      name: "Televisa Deportes",
+      category: "Deportes",
+
     },
     {
       id: 4,
-      logo: "https://placehold.co/50x50",
-      name: "Channel 4",
-      category: "Category 4",
-      price: "$799"
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Bandamax_2015_Logo.png/200px-Bandamax_2015_Logo.png",
+      name: "Bandamax",
+      category: "Música",
     },
     {
       id: 5,
-      logo: "https://placehold.co/50x50",
-      name: "Channel 5",
-      category: "Category 5",
-      price: "$999"
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Disney_XD_-_2015.svg/640px-Disney_XD_-_2015.svg.png",
+      name: "Disney XD",
+      category: "Niños",
+      
     }
   ]);
 
+  const [selectedCity, setSelectedCity] = useState(null);
+  const cities = [
+    { name: 'Deportes', code: 'NY' },
+    { name: 'Comedia', code: 'RM' },
+    { name: 'Niños', code: 'LDN' },
+    { name: 'Terror', code: 'IST' },
+    { name: 'Música', code: 'PRS' }
+  ];
+
   return (
-    <div className="bg-white p-4 rounded shadow">
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <>
+      {/* Contenedor del encabezado */}
+      <div className='w-full flex items-center justify-between mb-10'>
+        <h2 className='text-2xl font font-semibold'>Gestión de canales</h2>
+        <button className='bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition '>
+          <i className={`pi pi-plus mr-2`}
+            style={{ fontSize: '1rem', verticalAlign: 'middle' }}
+          />
+          Agregar canal
+        </button>
+      </div>
+
+      {/* Contenedor de canales */}
+      <div className="bg-white p-4 rounded shadow flex flex-col gap-y-4">
+        {/* Buscador */}
+        <div className='w-full flex items-center justify-start gap-x-6'>
+          <IconField iconPosition="left" className='border border-gray-300 rounded-lg w-[70%] '>
+            <InputIcon className="pi pi-search"> </InputIcon>
+            <InputText placeholder="Buscar canal" className='w-full px-10 h-12' />
+          </IconField>
+
+          <div className='w-[15%] flex items-center justify-center'>
+            <i
+              className={`pi pi-filter mr-2`}
+              style={{ fontSize: '1.2rem' }}
+            />
+            <Dropdown value={selectedCity} onChange={(e) => setSelectedCity(e.value)} options={cities} optionLabel="name"
+              placeholder="Filtrar por categoría" className="w-full border border-gray-300 md:w-14rem " checkmark={true} highlightOnSelect={false} />
+          </div>
+        </div>
+
+
+        {/* Tabla de registros */}
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase dark:text-gray-400">
-            <tr>
-              <th scope="col" className="px-6 py-3 bg-gray-50 dark:bg-gray-800">Logo</th>
+            <tr className='bg-gray-100 '>
+              <th scope="col" className="px-6 py-3 ">Logo</th>
               <th scope="col" className="px-6 py-3">Nombre</th>
-              <th scope="col" className="px-6 py-3 bg-gray-50 dark:bg-gray-800">Categoría</th>
-              <th scope="col" className="px-6 py-3">Precio</th>
+              <th scope="col" className="px-6 py-3 ">Categoría</th>
+              <th scope="col" className="px-6 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {channels.map((channel) => (
               <tr key={channel.id} className="border-b border-gray-200 dark:border-gray-700">
-                <td className="px-6 py-4 bg-gray-50 dark:bg-gray-800">
+                <td className="px-6 py-4 ">
                   <img src={channel.logo} alt={channel.name} className="w-8 h-8 object-contain" />
                 </td>
                 <td className="px-6 py-4">{channel.name}</td>
-                <td className="px-6 py-4 bg-gray-50 dark:bg-gray-800">{channel.category}</td>
-                <td className="px-6 py-4">{channel.price}</td>
+                <td className="px-6 py-4 ">{channel.category}</td>
+                <td className="px-6 py-4 flex gap-x-2">
+                  <button>editar</button>
+                  <button>eliminar</button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+
       </div>
-    </div>
+    </>
+
   );
 };
