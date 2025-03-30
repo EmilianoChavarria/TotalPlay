@@ -53,9 +53,9 @@ export const Channels = () => {
   return (
     <>
       {/* Contenedor del encabezado */}
-      <div className='w-full flex items-center justify-between mb-10'>
-        <h2 className='text-2xl font font-semibold'>Gestión de canales</h2>
-        <button className='bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition '>
+      <div className='w-full flex flex-col md:flex-row items-center justify-between'>
+        <h2 className='text-2xl font font-semibold whitespace-nowrap'>Gestión de Canales</h2>
+        <button className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition '>
           <i className={`pi pi-plus mr-2`}
             style={{ fontSize: '1rem', verticalAlign: 'middle' }}
           />
@@ -64,7 +64,7 @@ export const Channels = () => {
       </div>
 
       {/* Contenedor de canales */}
-      <div className="bg-white p-4 rounded shadow flex flex-col gap-y-4">
+      <div className="bg-white p-4 rounded shadow flex flex-col gap-y-4 mt-10">
         {/* Buscador */}
         <div className='w-full flex items-center justify-start gap-x-6'>
           <IconField iconPosition="left" className='border border-gray-300 rounded-lg w-[70%] '>
