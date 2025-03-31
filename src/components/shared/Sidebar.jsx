@@ -48,7 +48,7 @@ export const Sidebar = ({ items, collapsed, toggleCollapse, closeSidebarMobile }
                         {!collapsed && item.name}
                     </Link>
                 ))}
-                
+
                 <Link
                     to="/logout"
                     onClick={handleLinkClick}
