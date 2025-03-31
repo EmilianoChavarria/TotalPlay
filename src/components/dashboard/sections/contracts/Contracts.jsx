@@ -55,7 +55,7 @@ export const Contracts = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">Client Contracts</h1>
+      <h1 className="text-2xl font-bold mb-6">Contratos de clientes</h1>
       
       <div className="overflow-x-auto bg-white rounded-lg shadow">
         <table className="min-w-full">
@@ -90,7 +90,7 @@ export const Contracts = () => {
                         console.log('Add contract for', client.name);
                       }}
                     >
-                      + Add Contract
+                      + Agregar contrato
                     </button>
                   </td>
                 </tr>
