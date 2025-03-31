@@ -15,7 +15,7 @@ export const Navbar = ({ toggleCollapse }) => {
           Panel de administrador
         </span>
       </div>
-      <div className='flex gap-x-6 font-light'>
+      <div className='flex items-center justify-center gap-x-6 font-light'>
         <div className='hidden md:block'>
           <i
             className={`pi pi-user mr-2`}
@@ -24,9 +24,9 @@ export const Navbar = ({ toggleCollapse }) => {
           <span>Admin</span>
         </div>
         <div className='hidden md:block'>
-          <Link className='flex items-center justify-center' to='/'>
+          <Link className='flex items-center border border-white rounded-md p-2 justify-center hover:border-red-600 hover:text-red-700 transition duration-150' to='/'>
             <i
-              className={`pi pi-sign-out mr-2 text-red-700`}
+              className={`pi pi-sign-out mr-2 `}
               style={{ fontSize: '1.2rem' }}
             />
             <span className='hidden md:block'>Cerrar sesión</span>
