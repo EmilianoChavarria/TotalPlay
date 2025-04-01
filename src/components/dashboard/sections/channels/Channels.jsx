@@ -96,7 +96,7 @@ export const Channels = () => {
             <InputText placeholder="Buscar canal" className='w-full px-10 h-12' />
           </IconField>
 
-          <div className='w-[15%] flex items-center justify-center'>
+          <div className='w-[15%] md:w-[25%] flex items-center justify-center'>
             <i
               className={`pi pi-filter mr-2`}
               style={{ fontSize: '1.2rem' }}

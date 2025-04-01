@@ -56,7 +56,7 @@ export const CategoryModal = ({ visibleD, setVisibleD }) => {
                             value={formik.values.name}
                             onChange={(e) => handleChange('name', e.target.value)}
                         />
-                        <label htmlFor="name">Nombre del canal</label>
+                        <label htmlFor="name">Nombre de la categoría</label>
                     </FloatLabel>
                     {formik.touched.name && formik.errors.name && (
                         <div className="text-red-500 text-xs mt-1">{formik.errors.name}</div>

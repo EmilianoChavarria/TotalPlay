@@ -170,7 +170,7 @@ export const ChannelModal = ({ visible, setVisible }) => {
     return (
         <>
 
-            <Dialog header="Agregar canal" visible={visible} className='w-full md:w-[30vw]' onHide={() => { if (!visible) return; setVisible(false); }}>
+            <Dialog header="Agregar canal" visible={visible} className='w-full md:w-[40vw]' onHide={() => { if (!visible) return; setVisible(false); }}>
                 <form onSubmit={formik.handleSubmit}>
                     {/* Campo name */}
                     <div className='mt-6'>
@@ -198,7 +198,7 @@ export const ChannelModal = ({ visible, setVisible }) => {
                                 className={`border ${formik.touched.description && formik.errors.description ? 'border-red-500' : 'border-gray-300'} pl-4 w-full`}
                                 value={formik.values.description}
                                 onChange={(e) => handleChange('description', e.target.value)}
-                                rows={5} cols={30}
+                                rows={3} cols={30}
                             />
                             <label htmlFor="description">Descripción del canal</label>
                         </FloatLabel>

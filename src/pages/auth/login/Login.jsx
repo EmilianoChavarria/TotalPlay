@@ -53,7 +53,7 @@ export const Login = () => {
 
     return (
         <div className='h-screen w-full bg-gray-100 flex items-center justify-center'>
-            <div className='bg-white rounded-lg p-6 min-w-[25%]'>
+            <div className='bg-white rounded-lg p-6 max-w-[100%] shadow-lg md:max-w-[25%]'>
                 <h1 className='text-2xl font-bold text-center'>Inicio de sesión</h1>
 
                 <form onSubmit={formik.handleSubmit} className='mt-8'>
