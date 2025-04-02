@@ -25,7 +25,7 @@ export const Sidebar = ({ items, collapsed, toggleCollapse, closeSidebarMobile }
                 <div className="flex items-center justify-between py-4 px-5 mb-6">
                     <div className="flex items-center justify-center max-h-10">
                         <img src={logo} alt="logo" className="h-10" />
-                        {!collapsed && <h2 className="text-xl font-bold ml-2">TotalSex</h2>}
+                        {!collapsed && <Link to={"/dashboard/home"} className="text-xl font-bold ml-2">TotalSex</Link>}
                     </div>
                 </div>
 
@@ -50,7 +50,7 @@ export const Sidebar = ({ items, collapsed, toggleCollapse, closeSidebarMobile }
                 ))}
 
                 <Link
-                    to="/logout"
+                    to="/"
                     onClick={handleLinkClick}
                     className="flex md:hidden items-center text-base py-3 px-4 hover:bg-gray-100 transition text-red-800 font-medium whitespace-nowrap"
                 >

@@ -194,7 +194,7 @@ export const ChannelPackageModal = ({ visible, setVisible }) => {
                   {allChannels.map(channel => (
                     <div key={channel.id} className='flex justify-between items-center hover:bg-gray-50 py-2 px-1'>
                       <div className='flex items-center justify-start gap-x-4'>
-                        <img src={channel.logo} alt={channel.name} className="w-6 h-6 object-contain" />
+                        <img src={channel.logo} alt={channel.name} className="hidden md:block w-6 h-6 object-contain" />
                         <div>
                           <p className='text-sm font-semibold text-gray-950'>{channel.name}</p>
                           <p className='text-sm font-light'>{channel.category}</p>
@@ -228,7 +228,7 @@ export const ChannelPackageModal = ({ visible, setVisible }) => {
                     {selectedChannels.map(channel => (
                       <div key={channel.id} className='flex justify-between items-center hover:bg-gray-50 py-2 px-1'>
                         <div className='flex items-center justify-start gap-x-4'>
-                          <img src={channel.logo} alt={channel.name} className="w-6 h-6 object-contain" />
+                          <img src={channel.logo} alt={channel.name} className=" hidden md:block w-6 h-6 object-contain" />
                           <div>
                             <p className='text-sm font-semibold text-gray-950'>{channel.name}</p>
                             <p className='text-sm font-light'>{channel.category}</p>
