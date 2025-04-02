@@ -145,7 +145,7 @@ export const ChannelPackageModal = ({ visible, setVisible }) => {
                 value={formik.values.amount}
                 onChange={(e) => handleChange('amount', e.target.value)}
               />
-              <label htmlFor="amount">Precio ($/mes)</label>
+              <label htmlFor="amount">Precio</label>
             </FloatLabel>
             {formik.touched.amount && formik.errors.amount && (
               <div className="text-red-500 text-xs mt-1">{formik.errors.amount}</div>

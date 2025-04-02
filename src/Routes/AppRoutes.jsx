@@ -7,8 +7,9 @@ import { Packages } from '../components/dashboard/sections/packages/Packages'
 import { Channels } from '../components/dashboard/sections/channels/Channels'
 import { Contracts } from '../components/dashboard/sections/contracts/Contracts'
 import { Reports } from '../components/dashboard/sections/reports/Reports'
-import { ChannelPackage } from '../components/dashboard/sections/packages/ChannelPackage'
-import { SalesPackage } from '../components/dashboard/sections/packages/SalesPackage'
+import { SalesPackage } from '../components/dashboard/sections/packages/SalesPackage/SalesPackage'
+import { ChannelPackage } from '../components/dashboard/sections/packages/ChannelPackage/ChannelPackage'
+
 
 
 export const AppRoutes = () => {

@@ -1,5 +1,5 @@
 import React from 'react'
-import { CardPackage } from './CardPackage'
+import { CardPackage } from '../CardPackage'
 import { ChannelPackageModal } from './ChannelPackageModal'
 import { useState } from 'react';
 
