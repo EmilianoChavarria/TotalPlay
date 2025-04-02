@@ -10,7 +10,7 @@ export const Layout = ({ userRole = "admin" }) => {
     const sidebarItems = {
         admin: [
             { name: "Dashboard", link: "/dashboard/home", icon: "pi pi-objects-column" },
-            { name: "Paquetes", link: "/dashboard/packages", icon: "pi pi-box" },
+            { name: "Paquetes", link: "/dashboard/packages/channelPackages", icon: "pi pi-box" },
             { name: "Canales", link: "/dashboard/channels", icon: "pi pi-desktop" },
             { name: "Contratos", link: "/dashboard/contracts", icon: "pi pi-file" },
             { name: "Reportes", link: "/dashboard/reports", icon: "pi pi-chart-bar" }
