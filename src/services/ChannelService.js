@@ -1,9 +1,24 @@
-export const ChannelService = () => {
+import { BASE_URL } from "../config/const";
 
-    const getChannels = async () => {
-        const response = await fetch('http://localhost:3001/api/channels');
-        const data = await response.json();
-        return data;
+const token = localStorage.getItem('token');
+export const ChannelService = {
+
+
+    saveChannel: async (channel) => {
+        try {
+            const response = await fetch(`${BASE_URL}/channel/saveImg`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(channel)
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            return error;
+        }
     }
 
 }

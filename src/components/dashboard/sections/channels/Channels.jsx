@@ -3,27 +3,15 @@ import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from 'primereact/dropdown';
-import { Dialog } from 'primereact/dialog';
-import { FloatLabel } from 'primereact/floatlabel';
-import { InputTextarea } from "primereact/inputtextarea";
-import { AutoComplete } from "primereact/autocomplete";
 
 
 
 // Esto es para el formulario
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
 import { ChannelModal } from './ChannelModal';
 
 export const Channels = () => {
 
   const [visible, setVisible] = useState(false);
-  
-
-
-
-
-
 
   const [channels, setChannels] = useState([
     {

@@ -33,7 +33,6 @@ export const CategoryModal = ({ visibleD, setVisibleD }) => {
             console.log('Datos del formulario:', values);
             // Cerrar el modal
             setVisibleD(false);
-            // navigate('/dashboard/home');
         },
     });
 

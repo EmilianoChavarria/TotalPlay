@@ -5,6 +5,7 @@ import { FloatLabel } from 'primereact/floatlabel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
+import { AuthService } from '../../../services/AuthService';
 
 export const Login = () => {
     const navigate = useNavigate();
@@ -34,9 +35,23 @@ export const Login = () => {
             password: '',
         },
         validationSchema,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log('Datos del formulario:', values);
-            navigate('/dashboard/home');
+            try {
+                const response = await AuthService.login(values.email, values.password);
+                console.log('Respuesta del servidor:', response);
+                if (response.jwt) {
+                    // Guardar token en localStorage
+                    localStorage.setItem('token', response.jwt);
+                    // Redirigir a la página de dashboard
+                    navigate('/dashboard/home');
+                }
+
+            } catch (error) {
+                console.error('Error en el inicio de sesión:', error);
+                
+            }
+
         },
     });
 

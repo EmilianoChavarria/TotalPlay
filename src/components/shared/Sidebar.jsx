@@ -29,9 +29,9 @@ export const Sidebar = ({ items, collapsed, toggleCollapse, closeSidebarMobile }
                     </div>
                 </div>
 
-                {items.map((item, index) => (
+                {items.map((item) => (
                     <Link
-                        key={index}
+                        key={item.link}
                         to={item.link}
                         onClick={handleLinkClick}
                         className={`flex items-center font-light text-base py-3 px-4 hover:bg-gray-100 transition ${isActive(item.link)

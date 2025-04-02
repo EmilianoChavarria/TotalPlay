@@ -1,5 +1,4 @@
-import React from 'react'
-import { useState } from 'react';
+import React, { useState } from 'react'
 
 import { Dialog } from 'primereact/dialog';
 import { FloatLabel } from 'primereact/floatlabel';
@@ -12,6 +11,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 import { CategoryModal } from './CategoryModal';
+import { ChannelService } from '../../../../services/ChannelService';
 
 export const ChannelModal = ({ visible, setVisible }) => {
 
@@ -103,7 +103,7 @@ export const ChannelModal = ({ visible, setVisible }) => {
         }, 250);
     };
 
-    // TODO: Implementar la lógica para subir la imagen
+
     const [previewImage, setPreviewImage] = useState(null);
 
     const handleImageChange = (event) => {
@@ -155,9 +155,23 @@ export const ChannelModal = ({ visible, setVisible }) => {
             logo: ''
         },
         validationSchema,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log('Datos del formulario:', values);
-            // navigate('/dashboard/home');
+            const formData = new FormData();
+            formData.append("name", values.name);
+            formData.append("description", values.description);
+            formData.append("number", values.number);
+            formData.append("category", values.category);
+            formData.append("image", values.logo); 
+
+            try {
+                console.log(formData)
+                const response = await ChannelService.saveChannel(formData);
+                console.log("Respuesta del servidor:", response);
+            } catch (error) {
+                console.log("Error al crear el canal:", error);
+            }
+
         },
     });
 
@@ -225,7 +239,7 @@ export const ChannelModal = ({ visible, setVisible }) => {
                     </div>
 
                     {/* Campo category con AutoComplete */}
-                    <div className={`${formik.touched.number && formik.errors.number ? 'mt-8' : 'mt-8'}`}>
+                    <div className={`${formik.touched.number && formik.errors.number ? 'mt-8' : 'mt-6'}`}>
                         <div className='flex justify-between items-center w-full'>
                             <FloatLabel className='w-[80%] md:w-[65%]'>
                                 <AutoComplete
@@ -252,7 +266,7 @@ export const ChannelModal = ({ visible, setVisible }) => {
                         )}
                     </div>
 
-                    {/*TODO: Campo logo (imagen) */}
+
                     <div className={`${formik.touched.category && formik.errors.category ? 'mt-8' : 'mt-6'}`}>
                         <label className="block text-xs font-medium text-gray-500 mb-1 ml-4">
                             Logo del canal

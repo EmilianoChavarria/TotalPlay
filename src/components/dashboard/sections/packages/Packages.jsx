@@ -1,27 +1,33 @@
 import React from 'react'
-import { CardPackage } from './CardPackage'
+import { NavLink, Outlet } from 'react-router-dom'
 
 export const Packages = () => {
   return (
-    <div className='flex flex-col'>
-      {/* Contenedor del encabezado */}
-      <div className='w-full flex flex-col md:flex-row items-center justify-between'>
-        <h2 className='text-2xl font font-semibold whitespace-nowrap'>Gestión de paquetes</h2>
-        <button className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition '>
-          <i className={`pi pi-plus mr-2`}
-            style={{ fontSize: '1rem', verticalAlign: 'middle' }}
-          />
-          Agregar paquete
-        </button>
+    <>
+      <div className='w-full border-b-2 border-gray-200 flex gap-x-2 pt-2'>
+        <NavLink
+          to="/dashboard/packages/channelPackages"
+          className={({ isActive }) =>
+            `px-4 border-b-2 pb-2 ${isActive ? 'text-blue-500 border-blue-500' : 'text-black border-b-0'}`
+          }
+        >
+          Paquetes de canales
+        </NavLink>
+        <NavLink
+          to="/dashboard/packages/salesPackages"
+          className={({ isActive }) =>
+            `px-4 border-b-2 pb-2 ${isActive ? 'text-blue-500 border-blue-500' : 'text-black border-b-0 hover:'}`
+          }
+        >
+          Paquetes de ventas
+        </NavLink>
       </div>
 
-      {/* Contenedor de canales */}
-      <section className='grid grid-cols-1 md:grid-cols-3 gap-6 mt-6'>
-        <CardPackage />
-        <CardPackage />
-        <CardPackage />
-        <CardPackage />
-      </section>
-    </div>
+      <div className='p-0 md:p-4'>
+
+        <Outlet />
+      </div>
+
+    </>
   )
 }
