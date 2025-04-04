@@ -7,6 +7,7 @@ import { InputText } from "primereact/inputtext";
 // Esto es para el formulario
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { CategoryService } from '../../../../services/CategoryService';
 
 export const CategoryModal = ({ visibleD, setVisibleD }) => {
 
@@ -29,9 +30,13 @@ export const CategoryModal = ({ visibleD, setVisibleD }) => {
             name: '',
         },
         validationSchema,
-        onSubmit: (values) => {
+        onSubmit: async (values) => {
             console.log('Datos del formulario:', values);
+            
             // Cerrar el modal
+            const response = await CategoryService.saveCategory(values.name);
+            console.log(response);
+            formik.resetForm();
             setVisibleD(false);
         },
     });
