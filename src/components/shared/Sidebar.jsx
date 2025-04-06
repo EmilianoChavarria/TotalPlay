@@ -25,7 +25,7 @@ export const Sidebar = ({ items, collapsed, toggleCollapse, closeSidebarMobile }
                 <div className="flex items-center justify-between py-4 px-5 mb-6">
                     <div className="flex items-center justify-center max-h-10">
                         <img src={logo} alt="logo" className="h-10" />
-                        {!collapsed && <Link to={"/dashboard/home"} className="text-xl font-bold ml-2">TotalPlay</Link>}
+                        {!collapsed && <Link to={"/dashboard/home"} className="text-xl font-bold ml-2">TotalSex</Link>}
                     </div>
                 </div>
 
