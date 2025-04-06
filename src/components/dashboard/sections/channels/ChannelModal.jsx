@@ -24,7 +24,8 @@ export const ChannelModal = ({ visible, setVisible }) => {
     const validationSchema = Yup.object().shape({
         name: Yup.string()
             .required("El nombre del canal es obligatorio")
-            .matches(/^[a-zA-Z0-9\s]*$/, "El nombre del canal no es válido"),
+        // .matches(/^[a-zA-Z0-9\s]*$/, "El nombre del canal no es válido")
+        ,
         description: Yup.string()
             .required("La descripción del canal es obligatoria")
             .matches(/^[a-zA-Z0-9\s]*$/, "La descripción del canal no es válida"),
@@ -42,10 +43,10 @@ export const ChannelModal = ({ visible, setVisible }) => {
             }),
         logo: Yup.string()
             .required("El logo del canal es obligatorio")
-            .test("is-valid-image", "La imagen no es válida", (value) => {
-                if (!value) return false;
-                return value.startsWith('data:image');
-            })
+        // .test("is-valid-image", "La imagen no es válida", (value) => {
+        //     if (!value) return false;
+        //     return value.startsWith('data:image');
+        // })
     });
 
     // Obtener categorías del servicio
@@ -105,30 +106,44 @@ export const ChannelModal = ({ visible, setVisible }) => {
             return;
         }
 
+        // Verificar el tipo MIME del archivo
         const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+
         if (!validTypes.includes(file.type)) {
+            console.log("Tipo de archivo no válido:", file.type);
             formik.setFieldError('logo', 'Formato de imagen no válido');
-            formik.setFieldTouched('logo', true, false);
-            event.target.value = '';
+            // event.target.value = ''; // Limpiar el archivo seleccionado
             return;
         }
 
-        if (file.size > 2000000) {
+        // Verificar el tamaño del archivo
+        if (file.size > 2000000) { // 2MB
             formik.setFieldError('logo', 'La imagen es demasiado grande');
-            formik.setFieldTouched('logo', true, false);
             event.target.value = '';
             return;
         }
 
+        // Verificar la cabecera del archivo para asegurar que es realmente una imagen
         const reader = new FileReader();
         reader.onloadend = () => {
-            const base64String = reader.result;
-            setPreviewImage(base64String);
-            formik.setFieldValue('logo', base64String); // Guardamos el base64 en lugar del File
-            formik.setFieldTouched('logo', true, false);
+            const arrayBuffer = reader.result;
+            const uint8Array = new Uint8Array(arrayBuffer);
+
+            // Comprobar si la cabecera del archivo corresponde a una imagen JPG o PNG
+            const header = uint8Array.slice(0, 4).join(',');
+            if (!header.startsWith('255,216,255,224') && !header.startsWith('137,80,78,71')) {
+                formik.setFieldError('logo', 'El archivo no es una imagen válida');
+                event.target.value = ''; // Limpiar el archivo seleccionado
+                return;
+            }
+
+            setPreviewImage(URL.createObjectURL(file));
+            formik.setFieldValue('logo', file);
         };
-        reader.readAsDataURL(file);
+        reader.readAsArrayBuffer(file);
     };
+
+
 
     // Configuración de Formik
     const formik = useFormik({
@@ -141,16 +156,23 @@ export const ChannelModal = ({ visible, setVisible }) => {
         },
         validationSchema,
         onSubmit: async (values) => {
-            console.log('Datos del formulario:', values);
+            const formData = new FormData();
+            formData.append('name', values.name);
+            formData.append('description', values.description);
+            formData.append('number', values.number);
+            formData.append('categoryId', values.category.id);
+            formData.append('image', values.logo);
+
+            console.log("Enviando datos:", formData);
+
             try {
-                const response = await ChannelService.saveChannel(values);
+                const response = await ChannelService.saveChannel(formData);
                 console.log("Respuesta del servidor:", response);
-                formik.resetForm();
-                setPreviewImage(null);
             } catch (error) {
                 console.log("Error al crear el canal:", error);
             }
         },
+
     });
 
     // Handler para cambios en los inputs

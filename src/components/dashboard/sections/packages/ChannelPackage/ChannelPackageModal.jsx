@@ -7,57 +7,54 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { FloatLabel } from 'primereact/floatlabel';
 import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
+import { ChannelService } from '../../../../../services/ChannelService';
+import { use } from 'react';
+import { useEffect } from 'react';
+import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
 
 
 export const ChannelPackageModal = ({ visible, setVisible }) => {
-  const [allChannels, setAllChannels] = useState([
-    {
-      id: 1,
-      logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Discovery_Kids_Logo_2021-Presente.webp",
-      name: "Discovery Kids",
-      category: "Niños",
-    },
-    {
-      id: 2,
-      logo: "https://upload.wikimedia.org/wikipedia/commons/c/c0/Fox_Broadcasting_Company_logo_%282019%29.svg",
-      name: "Fox",
-      category: "Comedia",
-    },
-    {
-      id: 3,
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Televisa_Deportes_logo.png/1200px-Televisa_Deportes_logo.png",
-      name: "Televisa Deportes",
-      category: "Deportes",
-    },
-    {
-      id: 4,
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Bandamax_2015_Logo.png/200px-Bandamax_2015_Logo.png",
-      name: "Bandamax",
-      category: "Música",
-    },
-    {
-      id: 5,
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Disney_XD_-_2015.svg/640px-Disney_XD_-_2015.svg.png",
-      name: "Disney XD",
-      category: "Niños",
-    }
-  ]);
-
+  
   const [selectedChannels, setSelectedChannels] = useState([]);
+
+  const [channels, setChannels] = useState([]);
+
+  const fetchChannels = async () => {
+    
+    try {
+      const response = await ChannelService.getAllChannels();
+      console.log(response)
+      if (response.data && Array.isArray(response.data)) {
+        setChannels(response.data);
+      } else {
+        console.error("Formato de datos inesperado:", response);
+        setChannels([]);
+      }
+    } catch (error) {
+      console.error("Error al obtener las categorías:", error);
+      setChannels([]);
+    }
+  };
+
+  useEffect(() => {
+    if (visible) {
+        fetchChannels();
+    }
+}, [visible]);
+
 
   // Agrega el canal a la segunda lista
   const addChannel = (channel) => {
     setSelectedChannels([...selectedChannels, channel]);
-    setAllChannels(allChannels.filter(c => c.id !== channel.id));
+    setChannels(channels.filter(c => c.id !== channel.id));
   };
 
   // Remueve el canal de la segunda lista
   const removeChannel = (channel) => {
-    setAllChannels([...allChannels, channel]);
+    setChannels([...channels, channel]);
     setSelectedChannels(selectedChannels.filter(c => c.id !== channel.id));
   };
 
@@ -93,18 +90,18 @@ export const ChannelPackageModal = ({ visible, setVisible }) => {
       console.log('Datos del formulario:', values);
       const packageData = {
         ...values,
-        channels: selectedChannels.map(c => c.id)
+        channels: selectedChannels.map(c => ({id:c.id}))
       };
       console.log('Package data to submit:', packageData);
 
       // Here you would typically send the data to your API
-      // try {
-      //   const response = await PackageService.savePackage(packageData);
-      //   console.log("Respuesta del servidor:", response);
-      //   setVisible(false);
-      // } catch (error) {
-      //   console.log("Error al crear el paquete:", error);
-      // }
+      try {
+        const response = await ChannelPackageService.saveChannelPackage(packageData);
+        console.log("Respuesta del servidor:", response);
+        // setVisible(false);
+      } catch (error) {
+        console.log("Error al crear el paquete:", error);
+      }
     },
   });
 
@@ -191,13 +188,17 @@ export const ChannelPackageModal = ({ visible, setVisible }) => {
                 </span>
                 {/* Listado de canales */}
                 <div className='py-4 flex flex-col gap-y-2'>
-                  {allChannels.map(channel => (
+                  {channels.map(channel => (
                     <div key={channel.id} className='flex justify-between items-center hover:bg-gray-50 py-2 px-1'>
                       <div className='flex items-center justify-start gap-x-4'>
-                        <img src={channel.logo} alt={channel.name} className="hidden md:block w-6 h-6 object-contain" />
+                      <img
+                        src={`data:image/jpeg;base64,${channel.logoBean?.image}`}
+                        alt={channel.name}
+                        className="hidden md:block w-6 h-6 object-contain"
+                      />
                         <div>
                           <p className='text-sm font-semibold text-gray-950'>{channel.name}</p>
-                          <p className='text-sm font-light'>{channel.category}</p>
+                          <p className='text-sm font-light'>{channel.category.name}</p>
                         </div>
                       </div>
                       <button type="button" onClick={() => addChannel(channel)}>
@@ -208,7 +209,7 @@ export const ChannelPackageModal = ({ visible, setVisible }) => {
                       </button>
                     </div>
                   ))}
-                  {allChannels.length === 0 && (
+                  {channels.length === 0 && (
                     <div className="text-sm text-gray-500 py-2 text-center">
                       No hay canales disponibles
                     </div>
@@ -228,10 +229,14 @@ export const ChannelPackageModal = ({ visible, setVisible }) => {
                     {selectedChannels.map(channel => (
                       <div key={channel.id} className='flex justify-between items-center hover:bg-gray-50 py-2 px-1'>
                         <div className='flex items-center justify-start gap-x-4'>
-                          <img src={channel.logo} alt={channel.name} className=" hidden md:block w-6 h-6 object-contain" />
+                        <img
+                        src={`data:image/jpeg;base64,${channel.logoBean?.image}`}
+                        alt={channel.name}
+                        className="hidden md:block w-6 h-6 object-contain"
+                      />
                           <div>
                             <p className='text-sm font-semibold text-gray-950'>{channel.name}</p>
-                            <p className='text-sm font-light'>{channel.category}</p>
+                            <p className='text-sm font-light'>{channel.category.name}</p>
                           </div>
                         </div>
                         <button type="button" onClick={() => removeChannel(channel)}>

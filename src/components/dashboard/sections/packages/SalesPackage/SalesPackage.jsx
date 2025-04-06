@@ -25,10 +25,10 @@ export const SalesPackage = () => {
 
                 {/* Contenedor de canales */}
                 <section className='grid grid-cols-1 md:grid-cols-3 gap-6 mt-6'>
+                    {/* <CardPackage />
                     <CardPackage />
                     <CardPackage />
-                    <CardPackage />
-                    <CardPackage />
+                    <CardPackage /> */}
                 </section>
             </div>
             <SalesPackageModal visible={visible} setVisible={setVisible}/>

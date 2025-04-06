@@ -1,25 +1,26 @@
 import { BASE_URL, token } from "../config/const";
 
-export const ChannelService = {
-    saveChannel: async (channel) => {
+export const ChannelPackageService = {
+    
+    saveChannelPackage: async (channelPackage) => {
         try {
-            const response = await fetch(`${BASE_URL}/channel/saveImg`, {
+            const response = await fetch(`${BASE_URL}/channelPackage/save`, {
                 method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: channel
-            });
+                body: JSON.stringify(channelPackage)
+            })
             return await response.json();
         } catch (error) {
             return error;
         }
     },
 
-
-    getAllChannels: async () => {
+    getAllChannelPackages: async () => {
         try {
-            const response = await fetch(`${BASE_URL}/channel/`, {
+            const response = await fetch(`${BASE_URL}/channelPackage/`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -33,4 +34,5 @@ export const ChannelService = {
             return error;
         }
     },
-};
+
+}

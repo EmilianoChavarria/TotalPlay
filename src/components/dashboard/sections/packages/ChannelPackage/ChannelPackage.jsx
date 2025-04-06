@@ -2,9 +2,27 @@ import React from 'react'
 import { CardPackage } from '../CardPackage'
 import { ChannelPackageModal } from './ChannelPackageModal'
 import { useState } from 'react';
+import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
+import { useEffect } from 'react';
 
 export const ChannelPackage = () => {
   const [visible, setVisible] = useState(false);
+  const [channelPackages, setChannelPackages] = useState([]);
+
+  const getAllChannelPackages = async () => {
+    try {
+      const response = await ChannelPackageService.getAllChannelPackages();
+      console.log(response);
+      setChannelPackages(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    getAllChannelPackages();
+  }, []);
+
 
 
   return (
@@ -26,10 +44,15 @@ export const ChannelPackage = () => {
 
         {/* Contenedor de canales */}
         <section className='grid grid-cols-1 md:grid-cols-3 gap-6 mt-6'>
-          <CardPackage />
-          <CardPackage />
-          <CardPackage />
-          <CardPackage />
+
+          {/* Mapeo de los paquetes de canales */}
+          {channelPackages.map((channelPackage) => (
+            console.log(channelPackage),
+            <CardPackage key={channelPackage.id} channelPackage={channelPackage} />
+          ))}
+
+
+
         </section>
       </div>
 
