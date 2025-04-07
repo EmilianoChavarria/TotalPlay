@@ -63,13 +63,13 @@ export const ChannelPackageModal = ({ visible, setVisible }) => {
     name: Yup.string()
       .required("El nombre del paquete es obligatorio")
       .matches(
-        /^[a-zA-Z0-9\s]*$/,
+        /^[^\s][a-zA-ZÁÉÍÓÚáéíóúñÑ\s]*[^\s]$/,
         "El nombre del paquete no es válido"
       ),
     description: Yup.string()
       .required("La descripción del paquete es obligatoria")
       .matches(
-        /^[a-zA-Z0-9\s]*$/,
+        /^[^\s][a-zA-ZÁÉÍÓÚáéíóúñÑ\s]*[^\s]$/,
         "La descripción del paquete no es válida"
       ),
     amount: Yup.number()
@@ -112,8 +112,8 @@ export const ChannelPackageModal = ({ visible, setVisible }) => {
   };
 
   return (
-    <Dialog header="Agregar paquete de canales" visible={visible} className='w-full md:w-[60vw] xl:w-[60vw] 2xl:w-[40vw]' onHide={() => { if (!visible) return; setVisible(false); }}>
-      <form onSubmit={formik.handleSubmit} className='mt-4'>
+    <Dialog header="Agregar paquete de canales" visible={visible} className='w-full  md:w-[60vw] xl:w-[60vw] 2xl:w-[40vw]' onHide={() => { if (!visible) return; setVisible(false); }}>
+      <form onSubmit={formik.handleSubmit} className='mt-10'>
         <div className='mt-4 flex flex-col md:flex-row justify-between items-start'>
           {/* Campo de nombre */}
           <div className='w-full md:w-[49%]'>
