@@ -33,4 +33,21 @@ export const ChannelService = {
             return error;
         }
     },
+
+    deleteChannel: async (id) => {
+        try {
+            const response = await fetch(`${BASE_URL}/channel/delete/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            return error;
+        }
+    },
 };

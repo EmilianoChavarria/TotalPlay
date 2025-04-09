@@ -1,7 +1,11 @@
 import React from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 
+
 export const Packages = () => {
+
+  
+
   return (
     <>
       <div className='w-full border-b-2 border-gray-200 flex gap-x-2 pt-2'>

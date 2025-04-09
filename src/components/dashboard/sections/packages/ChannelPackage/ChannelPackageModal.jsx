@@ -14,9 +14,10 @@ import { ChannelService } from '../../../../../services/ChannelService';
 import { use } from 'react';
 import { useEffect } from 'react';
 import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
+import { showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
 
 
-export const ChannelPackageModal = ({ visible, setVisible }) => {
+export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
   
   const [selectedChannels, setSelectedChannels] = useState([]);
 
@@ -99,6 +100,26 @@ export const ChannelPackageModal = ({ visible, setVisible }) => {
         const response = await ChannelPackageService.saveChannelPackage(packageData);
         console.log("Respuesta del servidor:", response);
         // setVisible(false);
+
+        if (response.status === 'CREATED') {
+          setVisible(false);
+          formik.resetForm();
+          setSelectedChannels([]);
+          showSuccessAlert(response.message, () => {
+            if (onSuccess) {
+              onSuccess();
+            }
+          });
+        }else{
+          setVisible(false);
+          setSelectedChannels([]);
+          showErrorAlert(response.message || 'Ocurrió un error al crear el paquete', () => {
+            setVisible(true);
+          }
+
+          );
+        }
+
       } catch (error) {
         console.log("Error al crear el paquete:", error);
       }

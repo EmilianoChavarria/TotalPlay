@@ -14,7 +14,7 @@ export const Dashboard = () => {
         <DashboardCard name='Total de canales' quantity={10} icon='pi pi-desktop' />
       </div>
       <div className='w-full md:w-[23%]'>
-        <DashboardCard name='Usuarios' quantity={10} icon='pi pi-box' />
+        <DashboardCard name='Clientes' quantity={10} icon='pi pi-box' />
       </div>
       
 

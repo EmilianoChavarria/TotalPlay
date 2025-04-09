@@ -7,6 +7,8 @@ import { ChannelModal } from './ChannelModal';
 import { ChannelService } from '../../../../services/ChannelService';
 import { useEffect } from 'react';
 import { CategoryService } from '../../../../services/CategoryService';
+import Swal from 'sweetalert2';
+import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../CustomAlerts';
 
 export const Channels = () => {
 
@@ -68,6 +70,40 @@ export const Channels = () => {
     } finally {
       setLoadingChannels(false);
     }
+  };
+
+  const deleteChannel = async (id) => {
+    showConfirmAlert(
+      '¿Estás seguro de que deseas eliminar este canal?',
+      async () => {
+        setLoadingChannels(true);
+        try {
+          const response = await ChannelService.deleteChannel(id);
+          console.log(response)
+          if (response.status === 'OK') {
+            showSuccessAlert(response.message, () => {
+              fetchChannels();
+            });
+          } else {
+            showErrorAlert(response.message || 'Ocurrió un error al eliminar el canal');
+          }
+        } catch (error) {
+          console.error("Error al eliminar el canal:", error);
+          showErrorAlert('Ocurrió un error de conexión con el servidor');
+        } finally {
+          setLoadingChannels(false);
+        }
+      },
+      () => {
+        // Callback para cuando el usuario cancela
+        console.log('Eliminación cancelada por el usuario');
+      }
+    );
+  };
+
+  // Si el modal guardó un canal, recargar los canales
+  const handleChannelSaved = () => {
+    fetchChannels(); // Volver a cargar los canales
   };
 
   useEffect(() => {
@@ -153,7 +189,9 @@ export const Channels = () => {
                     <td className="px-6 py-4 ">{channel.category.name}</td>
                     <td className="px-6 py-4 flex gap-x-2">
                       <button>editar</button>
-                      <button>eliminar</button>
+                      <button onClick={() => {
+                        deleteChannel(channel.id);
+                      }}>eliminar</button>
                     </td>
                   </tr>
                 ))
@@ -170,6 +208,7 @@ export const Channels = () => {
       <ChannelModal
         visible={visible}
         setVisible={setVisible}
+        onSuccess={handleChannelSaved}
       />
 
 

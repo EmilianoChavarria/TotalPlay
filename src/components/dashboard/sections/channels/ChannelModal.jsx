@@ -12,8 +12,9 @@ import * as Yup from 'yup';
 import { CategoryModal } from './CategoryModal';
 import { ChannelService } from '../../../../services/ChannelService';
 import { CategoryService } from '../../../../services/CategoryService';
+import Swal from 'sweetalert2';
 
-export const ChannelModal = ({ visible, setVisible }) => {
+export const ChannelModal = ({ visible, setVisible, onSuccess  }) => {
     const [visibleD, setVisibleD] = useState(false);
     const [categories, setCategories] = useState([]);
     const [filteredCategories, setFilteredCategories] = useState([]);
@@ -24,7 +25,7 @@ export const ChannelModal = ({ visible, setVisible }) => {
     const validationSchema = Yup.object().shape({
         name: Yup.string()
             .required("El nombre del canal es obligatorio")
-        .matches(/^[^\s][a-zA-ZÁÉÍÓÚáéíóúñÑ\s]*[^\s]$/, "El nombre del canal no es válido")
+            .matches(/^[^\s][a-zA-ZÁÉÍÓÚáéíóúñÑ\s]*[^\s]$/, "El nombre del canal no es válido")
         ,
         description: Yup.string()
             .required("La descripción del canal es obligatoria")
@@ -163,15 +164,47 @@ export const ChannelModal = ({ visible, setVisible }) => {
             formData.append('categoryId', values.category.id);
             formData.append('image', values.logo);
 
-            console.log("Enviando datos:", formData);
-
             try {
                 const response = await ChannelService.saveChannel(formData);
                 console.log("Respuesta del servidor:", response);
+
+                if (response.status === 'OK') {
+                    setVisible(false);
+                    formik.resetForm();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: response.message,
+                    });
+                    if (onSuccess) {
+                        onSuccess();
+                    }
+                } else {
+                    setVisible(false);
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error, inténtelo nuevamente',
+                        text: response.message || 'Hubo un problema al guardar el canal',
+                    }).then(() => {
+                        setVisible(true); 
+                    });
+                }
+
+
             } catch (error) {
                 console.log("Error al crear el canal:", error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Hubo un problema de conexión o del servidor',
+                });
             }
-        },
+        }
+
+
 
     });
 

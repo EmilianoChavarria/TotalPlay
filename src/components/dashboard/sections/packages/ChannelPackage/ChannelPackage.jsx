@@ -19,6 +19,10 @@ export const ChannelPackage = () => {
     }
   }
 
+  const handlePackagesSaved = () => {
+    getAllChannelPackages(); // Volver a cargar los canales
+  };
+
   useEffect(() => {
     getAllChannelPackages();
   }, []);
@@ -47,7 +51,6 @@ export const ChannelPackage = () => {
 
           {/* Mapeo de los paquetes de canales */}
           {channelPackages.map((channelPackage) => (
-            console.log(channelPackage),
             <CardPackage key={channelPackage.id} channelPackage={channelPackage} />
           ))}
 
@@ -58,7 +61,9 @@ export const ChannelPackage = () => {
 
       {/* Modal de Paquete de canales */}
       <ChannelPackageModal visible={visible}
-        setVisible={setVisible} />
+        setVisible={setVisible} 
+        onSuccess={handlePackagesSaved}
+        />
     </>
   )
 }

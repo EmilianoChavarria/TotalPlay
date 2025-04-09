@@ -39,7 +39,7 @@ export const ChannelListModal = ({ visible, setVisible, packageName, channelList
 
     return (
         <Dialog
-            header={`Listado de canales del paquete: ${packageName || ''}`}
+            header={`Listado de canales`}
             visible={visible}
             className='w-full md:w-[60vw] xl:w-[60vw] 2xl:w-[45vw]'
             onHide={() => { if (!visible) return; setVisible(false); }}

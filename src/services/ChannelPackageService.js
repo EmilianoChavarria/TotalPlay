@@ -35,4 +35,20 @@ export const ChannelPackageService = {
         }
     },
 
+    deleteChannelPackage: async (id) => {
+        try {
+            const response = await fetch(`${BASE_URL}/channelPackage/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            return await response.json();
+        } catch (error) {
+            return error;
+        }
+    },
+
 }
