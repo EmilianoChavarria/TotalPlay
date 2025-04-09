@@ -2,10 +2,28 @@ import React from 'react'
 import { CardPackage } from '../CardPackage'
 import { useState } from 'react';
 import { SalesPackageModal } from './SalesPackageModal';
+import { SalesPackageService } from '../../../../../services/SalesPackageService';
+import { useEffect } from 'react';
 
 export const SalesPackage = () => {
 
     const [visible, setVisible] = useState(false);
+
+    const [salesPackage, setSalesPackage] = useState([]);
+
+    const getSalesPackage = async () => {
+        try {
+            const response = await SalesPackageService.getAllSalesPackage();
+            console.log(response)
+            setSalesPackage(response.data);
+        } catch (error) {
+
+        }
+    }
+
+    useEffect(() => {
+        getSalesPackage();
+    }, [])
 
     return (
         <>
@@ -29,9 +47,32 @@ export const SalesPackage = () => {
                     <CardPackage />
                     <CardPackage />
                     <CardPackage /> */}
+
+                    {salesPackage.map((item) => {
+                        return (
+                            <div key={item.id} className='bg-white p-4 rounded-lg shadow-sm flex flex-col'>
+                                <div className='flex items-center justify-between'>
+                                    <span className='text-lg font-medium text-gray-800'>{item.name}</span>
+                                    <i className={`pi pi-ellipsis-v mr-2 p-2 rounded-lg text-gray-800 hover:bg-gray-100 hover:cursor-pointer `}
+                                        style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}
+                                    />
+                                </div>
+                                <span>
+                                    ${item.totalAmount}/mes
+                                </span>
+                                <span>
+                                    Incluye {item.channelPackage.channels.length} canales
+                                </span>
+                                <span>
+                                    Incluye telefonía
+                                </span>
+                            </div>
+                        )
+                    }
+                    )}
                 </section>
             </div>
-            <SalesPackageModal visible={visible} setVisible={setVisible}/>
+            <SalesPackageModal visible={visible} setVisible={setVisible} />
         </>
     )
 }

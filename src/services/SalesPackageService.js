@@ -2,6 +2,9 @@ import { BASE_URL, token } from "../config/const";
 
 export const SalesPackageService = {
     saveChannel: async (salesPackage) => {
+        console.log(
+            JSON.stringify(salesPackage)
+        )
         try {
             const response = await fetch(`${BASE_URL}/salesPackage/save`, {
                 method: 'POST',
@@ -10,6 +13,21 @@ export const SalesPackageService = {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(salesPackage)
+            });
+            return await response.json();
+        } catch (error) {
+            return error;
+        }
+    },
+
+    getAllSalesPackage: async () => {
+        try {
+            const response = await fetch(`${BASE_URL}/salesPackage/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             });
             return await response.json();
         } catch (error) {

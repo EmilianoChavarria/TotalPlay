@@ -54,10 +54,20 @@ export const Contracts = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">Contratos de clientes</h1>
-      
-      <div className="overflow-x-auto bg-white rounded-lg shadow">
+    <>
+      {/* Contenedor del encabezado */}
+      <div className='w-full flex flex-col md:flex-row items-center justify-between'>
+        <h2 className='text-2xl font font-semibold whitespace-nowrap' >Gestión de contratos</h2>
+        <button className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition ' onClick={() => setVisible(true)}>
+          <i className={`pi pi-plus mr-2`}
+            style={{ fontSize: '1rem', verticalAlign: 'middle' }}
+          />
+          Agregar cliente
+        </button>
+      </div>
+
+      {/* Contenido */}
+      <div className="overflow-x-auto bg-white rounded-lg shadow mt-10">
         <table className="min-w-full">
           <thead className="bg-gray-50">
             <tr>
@@ -71,7 +81,7 @@ export const Contracts = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {clients.map((client) => (
               <React.Fragment key={client.id}>
-                <tr 
+                <tr
                   className="hover:bg-gray-50 cursor-pointer"
                   onClick={() => toggleClient(client.id)}
                 >
@@ -82,7 +92,7 @@ export const Contracts = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">{client.phone}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-gray-500">{client.totalContracts}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button 
+                    <button
                       className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -94,7 +104,7 @@ export const Contracts = () => {
                     </button>
                   </td>
                 </tr>
-                
+
                 {expandedClient === client.id && (
                   <tr>
                     <td colSpan="5" className="px-6 py-4">
@@ -106,11 +116,10 @@ export const Contracts = () => {
                                 <h3 className="font-medium text-lg">{contract.name}</h3>
                                 <p className="text-gray-600">{contract.price}</p>
                               </div>
-                              <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                                contract.status === "ACTIVE" 
-                                  ? "bg-green-100 text-green-800" 
+                              <span className={`px-2 py-1 text-xs font-semibold rounded-full ${contract.status === "ACTIVE"
+                                  ? "bg-green-100 text-green-800"
                                   : "bg-red-100 text-red-800"
-                              }`}>
+                                }`}>
                                 {contract.status}
                               </span>
                             </div>
@@ -129,6 +138,6 @@ export const Contracts = () => {
           </tbody>
         </table>
       </div>
-    </div>
+    </>
   );
 };

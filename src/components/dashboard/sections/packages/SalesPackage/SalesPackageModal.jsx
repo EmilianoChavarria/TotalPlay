@@ -77,6 +77,7 @@ export const SalesPackageModal = ({ visible, setVisible }) => {
         onSubmit: async (values) => {
             const formData = {
                 ...values,
+                price: calculateTotal().toFixed(2),
                 channel_package_name: selectedPackage.name
             };
             console.log('Datos del formulario:', formData);
@@ -95,6 +96,20 @@ export const SalesPackageModal = ({ visible, setVisible }) => {
         formik.setFieldValue(fieldName, value);
         formik.setFieldTouched(fieldName, true, false);
     };
+
+    const calculateTotal = () => {
+        const userAmount = parseFloat(formik.values.totalAmount) || 0;
+
+        let packageAmount = 0;
+        if (selectedPackage && selectedPackage.amount) {
+            // Elimina el símbolo $ y todo lo que no sea número o punto
+            const cleanedAmount = selectedPackage.amount;
+            packageAmount = parseFloat(cleanedAmount) || 0;
+        }
+
+        return userAmount + packageAmount;
+    };
+
 
     useEffect(() => {
         if (visible) {
@@ -195,6 +210,13 @@ export const SalesPackageModal = ({ visible, setVisible }) => {
                         ))}
                     </div>
                 </div>
+
+                <div className='w-full mt-5 border-t border-gray-300 flex items-center justify-end pt-4'>
+                    <span className='text-lg font-semibold'>
+                        Total: ${calculateTotal().toFixed(2)}
+                    </span>
+                </div>
+
 
                 {/* Botón de guardar */}
                 <div className='mt-8'>
