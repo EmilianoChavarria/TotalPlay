@@ -1,53 +1,76 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { ClientService } from '../../../../services/ClientService';
 
 export const Contracts = () => {
   const [expandedClient, setExpandedClient] = useState(null);
 
   // Datos de ejemplo (puedes reemplazar con datos reales de tu API)
-  const clients = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "123-456-7890",
-      totalContracts: 2,
-      contracts: [
-        {
-          id: 101,
-          name: "Premium Bundle",
-          status: "ACTIVE",
-          price: "$99.99/month",
-          started: "2023-01-01",
-          address: "123 Main St. City"
-        },
-        {
-          id: 102,
-          name: "Basic Internet",
-          status: "CANCELLED",
-          price: "$49.99/month",
-          started: "2022-06-15",
-          address: "123 Main St. City"
-        }
-      ]
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      phone: "098-765-4321",
-      totalContracts: 1,
-      contracts: [
-        {
-          id: 201,
-          name: "Basic Internet",
-          status: "ACTIVE",
-          price: "$49.99/month",
-          started: "2022-05-10",
-          address: "456 Oak Ave. Town"
-        }
-      ]
+  // const clients = [
+  //   {
+  //     id: 1,
+  //     name: "John Doe",
+  //     email: "john@example.com",
+  //     phone: "123-456-7890",
+  //     totalContracts: 2,
+  //     contracts: [
+  //       {
+  //         id: 101,
+  //         name: "Premium Bundle",
+  //         status: "ACTIVE",
+  //         price: "$99.99/month",
+  //         started: "2023-01-01",
+  //         address: "123 Main St. City"
+  //       },
+  //       {
+  //         id: 102,
+  //         name: "Basic Internet",
+  //         status: "CANCELLED",
+  //         price: "$49.99/month",
+  //         started: "2022-06-15",
+  //         address: "123 Main St. City"
+  //       }
+  //     ]
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Jane Smith",
+  //     email: "jane@example.com",
+  //     phone: "098-765-4321",
+  //     totalContracts: 1,
+  //     contracts: [
+  //       {
+  //         id: 201,
+  //         name: "Basic Internet",
+  //         status: "ACTIVE",
+  //         price: "$49.99/month",
+  //         started: "2022-05-10",
+  //         address: "456 Oak Ave. Town"
+  //       }
+  //     ]
+  //   }
+  // ];
+
+  const [clients, setClients] = useState([]);
+
+  const fetchClients = async () => {
+    try {
+      const response = await ClientService.gteClients();
+      console.log(response)
+      if (response.data && Array.isArray(response.data)) {
+        setClients(response.data);
+      } else {
+        console.error("Formato de datos inesperado:", response);
+        setClients([]);
+      }
+    } catch (error) {
+      console.error("Error al obtener los clientes:", error);
+      setClients([]);
     }
-  ];
+  }
+
+  useEffect(() => {
+    fetchClients();
+  }, []);
 
   const toggleClient = (clientId) => {
     setExpandedClient(expandedClient === clientId ? null : clientId);
@@ -67,30 +90,32 @@ export const Contracts = () => {
       </div>
 
       {/* Contenido */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow mt-10">
-        <table className="min-w-full">
+      <div className="overflow-x-auto bg-white p-4 rounded-md shadow mt-10">
+        <table className="min-w-full text-sm text-gray-500">
           <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Contracts</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <tr className='text-xs text-gray-700 uppercase'>
+              <th className="px-6 py-3 ">Nombre completo</th>
+              <th className="px-6 py-3 ">Email</th>
+              <th className="px-6 py-3 ">RFC</th>
+              <th className="px-6 py-3 ">Telefono</th>
+              <th className="px-6 py-3 ">Direcciones</th>
+              <th className="px-6 py-3 ">Acciones</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {clients.map((client) => (
               <React.Fragment key={client.id}>
                 <tr
-                  className="hover:bg-gray-50 cursor-pointer"
+                  className="hover:bg-gray-50 cursor-pointer text-center"
                   onClick={() => toggleClient(client.id)}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="font-medium text-gray-900">{client.name}</div>
+                  <td className="px-6 py-4 ">
+                    <div className="font-medium text-gray-900">{client.name} {client.lastName} {client.surname}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">{client.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">{client.phone}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">{client.totalContracts}</td>
+                  <td className="px-6 py-4">{client.email}</td>
+                  <td className="px-6 py-4">{client.rfc}</td>
+                  <td className="px-6 py-4">{client.phone}</td>
+                  <td className="px-6 py-4">{client.addresses.length}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
                       className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
