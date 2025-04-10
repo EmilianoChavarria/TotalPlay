@@ -1,9 +1,9 @@
 import React from 'react'
 import { useState } from 'react'
-import { ChannelListModal } from './ChannelPackage/ChannelListModal'
+import { ChannelListModal } from './ChannelListModal'
 import { Menu } from 'primereact/menu'; // Importa el componente Menu de PrimeReact
-import { ChannelPackageService } from '../../../../services/ChannelPackageService';
-import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../CustomAlerts';
+import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
+import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
 
 export const CardPackage = ({ channelPackage }) => {
     const [visible, setVisible] = useState(false)
@@ -82,7 +82,6 @@ export const CardPackage = ({ channelPackage }) => {
                 <div className='flex flex-col mt-3 gap-y-3'>
                     <span className='text-gray-800 font-light text-base'>{channelPackage.description}</span>
                     <span className='text-gray-800 font-light text-base'>{channelPackage.channels.length} canales incluidos</span>
-                    <span className='text-blue-500 font-semibold text-xl'>${channelPackage.amount}/mes</span>
                     <button 
                         onClick={() => setVisible(true)} 
                         className='w-full border border-gray-200 flex items-center justify-center rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition'

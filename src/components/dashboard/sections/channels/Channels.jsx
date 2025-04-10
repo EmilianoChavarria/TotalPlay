@@ -7,7 +7,6 @@ import { ChannelModal } from './ChannelModal';
 import { ChannelService } from '../../../../services/ChannelService';
 import { useEffect } from 'react';
 import { CategoryService } from '../../../../services/CategoryService';
-import Swal from 'sweetalert2';
 import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../CustomAlerts';
 
 export const Channels = () => {

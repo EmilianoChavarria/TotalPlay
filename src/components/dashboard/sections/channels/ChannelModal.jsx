@@ -25,11 +25,11 @@ export const ChannelModal = ({ visible, setVisible, onSuccess  }) => {
     const validationSchema = Yup.object().shape({
         name: Yup.string()
             .required("El nombre del canal es obligatorio")
-            .matches(/^[^\s][a-zA-ZÁÉÍÓÚáéíóúñÑ\s]*[^\s]$/, "El nombre del canal no es válido")
+            .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+$/, "El nombre del canal no es válido")
         ,
         description: Yup.string()
             .required("La descripción del canal es obligatoria")
-            .matches(/^[^\s][a-zA-ZÁÉÍÓÚáéíóúñÑ\s]*[^\s]$/, "La descripción del canal no es válida"),
+            .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+$/, "La descripción del canal no es válida"),
         number: Yup.number()
             .typeError('El número del canal no es válido')
             .required("El número del canal es obligatorio")
@@ -113,7 +113,6 @@ export const ChannelModal = ({ visible, setVisible, onSuccess  }) => {
         if (!validTypes.includes(file.type)) {
             console.log("Tipo de archivo no válido:", file.type);
             formik.setFieldError('logo', 'Formato de imagen no válido');
-            // event.target.value = ''; // Limpiar el archivo seleccionado
             return;
         }
 

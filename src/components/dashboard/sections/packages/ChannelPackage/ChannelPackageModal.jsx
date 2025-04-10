@@ -15,16 +15,35 @@ import { use } from 'react';
 import { useEffect } from 'react';
 import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
 import { showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
+import { Dropdown } from 'primereact/dropdown';
+import { CategoryService } from '../../../../../services/CategoryService';
 
 
 export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
-  
+
   const [selectedChannels, setSelectedChannels] = useState([]);
 
   const [channels, setChannels] = useState([]);
 
+  // -----------------------------------------------------------------------------------------------
+  const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCity, setSelectedCity] = useState(null);
+  const filteredChannels = channels.filter(channel => {
+    const matchesCategory =
+      !selectedCity || selectedCity.name === 'Todas' || channel.category.name === selectedCity.name;
+
+    const matchesSearch =
+      channel.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesCategory && matchesSearch;
+  });
+
+  // -----------------------------------------------------------------------------------------------
+
+
   const fetchChannels = async () => {
-    
+
     try {
       const response = await ChannelService.getAllChannels();
       console.log(response)
@@ -40,11 +59,27 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await CategoryService.getCategories();
+      if (response.data && Array.isArray(response.data)) {
+        setCategories([{ name: 'Todas' }, ...response.data]);
+      } else {
+        console.error("Formato de datos inesperado:", response);
+        setCategories([{ name: 'Todas' }]);
+      }
+    } catch (error) {
+      console.error("Error al obtener las categorías:", error);
+      setCategories([{ name: 'Todas' }]);
+    }
+  };
+
   useEffect(() => {
     if (visible) {
-        fetchChannels();
+      fetchChannels();
+      fetchCategories();
     }
-}, [visible]);
+  }, [visible]);
 
 
   // Agrega el canal a la segunda lista
@@ -64,13 +99,13 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
     name: Yup.string()
       .required("El nombre del paquete es obligatorio")
       .matches(
-        /^[^\s][a-zA-ZÁÉÍÓÚáéíóúñÑ\s]*[^\s]$/,
+        /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+$/,
         "El nombre del paquete no es válido"
       ),
     description: Yup.string()
       .required("La descripción del paquete es obligatoria")
       .matches(
-        /^[^\s][a-zA-ZÁÉÍÓÚáéíóúñÑ\s]*[^\s]$/,
+        /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+$/,
         "La descripción del paquete no es válida"
       ),
     amount: Yup.number()
@@ -91,7 +126,7 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
       console.log('Datos del formulario:', values);
       const packageData = {
         ...values,
-        channels: selectedChannels.map(c => ({id:c.id}))
+        channels: selectedChannels.map(c => ({ id: c.id }))
       };
       console.log('Package data to submit:', packageData);
 
@@ -109,7 +144,7 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
               onSuccess();
             }
           });
-        }else{
+        } else {
           setVisible(false);
           setSelectedChannels([]);
           showErrorAlert(response.message || 'Ocurrió un error al crear el paquete', () => {
@@ -196,11 +231,26 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
           <div className='flex justify-between items-start'>
             {/* Available Channels */}
             <div className='w-[49%] border border-gray-300 rounded-md'>
-              <div className='border-b border-gray-300 px-4 py-2'>
-                <IconField iconPosition="left" className='border border-gray-300 rounded-lg  '>
+              <div className='w-full p-4 flex flex-col items-center justify-start gap-x-6 gap-y-2'>
+                <IconField iconPosition="left" className='border border-gray-300 rounded-lg w-full '>
                   <InputIcon className="pi pi-search"> </InputIcon>
-                  <InputText placeholder="Buscar canal" className='w-full px-10 h-7' />
+                  <InputText
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Buscar canal"
+                    className='w-full px-10 h-12'
+                  />
+
                 </IconField>
+
+                <div className='w-full flex items-center justify-center'>
+                  <i
+                    className={`pi pi-filter mr-2`}
+                    style={{ fontSize: '1.2rem' }}
+                  />
+                  <Dropdown value={selectedCity} onChange={(e) => setSelectedCity(e.value)} options={categories} optionLabel="name"
+                    placeholder="Filtrar por categoría" className="w-full border border-gray-300 md:w-14rem " checkmark={true} highlightOnSelect={false} />
+                </div>
               </div>
               <div className='px-4 py-2'>
                 <span className='text-sm font-medium text-gray-700'>
@@ -208,14 +258,14 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
                 </span>
                 {/* Listado de canales */}
                 <div className='py-4 flex flex-col gap-y-2'>
-                  {channels.map(channel => (
+                  {filteredChannels.map(channel => (
                     <div key={channel.id} className='flex justify-between items-center hover:bg-gray-50 py-2 px-1'>
                       <div className='flex items-center justify-start gap-x-4'>
-                      <img
-                        src={`data:image/jpeg;base64,${channel.logoBean?.image}`}
-                        alt={channel.name}
-                        className="hidden md:block w-6 h-6 object-contain"
-                      />
+                        <img
+                          src={`data:image/jpeg;base64,${channel.logoBean?.image}`}
+                          alt={channel.name}
+                          className="hidden md:block w-6 h-6 object-contain"
+                        />
                         <div>
                           <p className='text-sm font-semibold text-gray-950'>{channel.name}</p>
                           <p className='text-sm font-light'>{channel.category.name}</p>
@@ -249,11 +299,11 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
                     {selectedChannels.map(channel => (
                       <div key={channel.id} className='flex justify-between items-center hover:bg-gray-50 py-2 px-1'>
                         <div className='flex items-center justify-start gap-x-4'>
-                        <img
-                        src={`data:image/jpeg;base64,${channel.logoBean?.image}`}
-                        alt={channel.name}
-                        className="hidden md:block w-6 h-6 object-contain"
-                      />
+                          <img
+                            src={`data:image/jpeg;base64,${channel.logoBean?.image}`}
+                            alt={channel.name}
+                            className="hidden md:block w-6 h-6 object-contain"
+                          />
                           <div>
                             <p className='text-sm font-semibold text-gray-950'>{channel.name}</p>
                             <p className='text-sm font-light'>{channel.category.name}</p>

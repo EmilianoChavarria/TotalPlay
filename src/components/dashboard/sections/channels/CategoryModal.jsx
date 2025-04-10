@@ -17,7 +17,7 @@ export const CategoryModal = ({ visibleD, setVisibleD }) => {
             .required("El nombre de la categoría es obligatorio")
             .matches(
                 // Regex de solo letras y números
-                /^[^\s][a-zA-ZÁÉÍÓÚáéíóúñÑ\s]*[^\s]$/,
+                /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+$/,
                 "El nombre de la categoría no es válida"
             )
 
@@ -32,7 +32,7 @@ export const CategoryModal = ({ visibleD, setVisibleD }) => {
         validationSchema,
         onSubmit: async (values) => {
             console.log('Datos del formulario:', values);
-            
+
             // Cerrar el modal
             const response = await CategoryService.saveCategory(values.name);
             console.log(response);
@@ -48,7 +48,10 @@ export const CategoryModal = ({ visibleD, setVisibleD }) => {
     };
 
     return (
-        <Dialog header="Registrar categoría" visible={visibleD} className='w-full md:w-[30vw]' onHide={() => { if (!visibleD) return; setVisibleD(false); }}>
+        <Dialog header="Registrar categoría" visible={visibleD} className='w-full md:w-[30vw]' onHide={() => {
+            if (!visibleD) return;
+            setVisibleD(false);
+        }}>
             <form onSubmit={formik.handleSubmit}>
                 {/* Campo name */}
                 <div className='mt-6'>

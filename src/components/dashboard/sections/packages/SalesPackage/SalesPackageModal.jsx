@@ -56,7 +56,7 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
     const validationSchema = Yup.object().shape({
         name: Yup.string()
             .required("El nombre es obligatorio")
-            .matches(/^[^\s][a-zA-ZÁÉÍÓÚáéíóúñÑ\s]*[^\s]$/, "El nombre del paquete no es válido"),
+            .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+$/, "El nombre del paquete no es válido"),
         totalAmount: Yup.number()
             .typeError("El precio debe ser un número")
             .required("El precio es obligatoria"),
@@ -78,7 +78,6 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
         onSubmit: async (values) => {
             const formData = {
                 ...values,
-                price: calculateTotal().toFixed(2),
                 channel_package_name: selectedPackage.name
             };
             console.log('Datos del formulario:', formData);
@@ -87,7 +86,7 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
                 const response = await SalesPackageService.saveChannel(formData);
                 console.log("Respuesta del servidor:", response);
         
-                if (response.status === 'CREATED' || response.success) { // Ajusta según la respuesta real de tu API
+                if (response.status === 'CREATED' || response.success) {
                     setVisible(false);
                     formik.resetForm();
                     showSuccessAlert(response.message || 'Paquete creado exitosamente', () => {
@@ -98,15 +97,12 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
                 } else {
                     setVisible(false);
                     showErrorAlert(response.message || 'Ocurrió un error al crear el paquete', () => {
-                        // Puedes agregar lógica adicional si es necesario
                         setVisible(true);
                     });
                 }
             } catch (error) {
                 console.log("Error al crear el paquete:", error);
-                showErrorAlert('Ocurrió un error al procesar la solicitud', () => {
-                    // Puedes agregar lógica adicional si es necesario
-                });
+                showErrorAlert('Ocurrió un error al procesar la solicitud');
             }
         },
     });
@@ -117,18 +113,6 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
         formik.setFieldTouched(fieldName, true, false);
     };
 
-    const calculateTotal = () => {
-        const userAmount = parseFloat(formik.values.totalAmount) || 0;
-
-        let packageAmount = 0;
-        if (selectedPackage && selectedPackage.amount) {
-            // Elimina el símbolo $ y todo lo que no sea número o punto
-            const cleanedAmount = selectedPackage.amount;
-            packageAmount = parseFloat(cleanedAmount) || 0;
-        }
-
-        return userAmount + packageAmount;
-    };
 
 
     useEffect(() => {
@@ -223,19 +207,12 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
                                     <p className='text-lg font-semibold'>{pkg.name}</p>
                                     <p className='text-sm text-gray-600'>Incluye {pkg.channels.length} canales</p>
                                 </div>
-                                <div>
-                                    <span className='text-xl text-blue-600 font-semibold'>${pkg.amount}/month</span>
-                                </div>
+                                
                             </div>
                         ))}
                     </div>
                 </div>
 
-                <div className='w-full mt-5 border-t border-gray-300 flex items-center justify-end pt-4'>
-                    <span className='text-lg font-semibold'>
-                        Total: ${calculateTotal().toFixed(2)}
-                    </span>
-                </div>
 
 
                 {/* Botón de guardar */}

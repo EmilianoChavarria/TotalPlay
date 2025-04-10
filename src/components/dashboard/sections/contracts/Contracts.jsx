@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ClientService } from '../../../../services/ClientService';
-import { ClientModal } from './ClientModal';
+import { ClientModal } from './clients/ClientModal';
 
 export const Contracts = () => {
   const [expandedClient, setExpandedClient] = useState(null);

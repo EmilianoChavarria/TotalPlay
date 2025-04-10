@@ -1,5 +1,5 @@
 import React from 'react'
-import { CardPackage } from '../CardPackage'
+import { CardPackage } from '../ChannelPackage/CardPackage'
 import { useState } from 'react';
 import { SalesPackageModal } from './SalesPackageModal';
 import { SalesPackageService } from '../../../../../services/SalesPackageService';
@@ -22,6 +22,10 @@ export const SalesPackage = () => {
 
         }
     }
+
+    const handleSalesPackageSaved = () => {
+        getSalesPackage(); // Volver a cargar los canales
+      };
 
     useEffect(() => {
         getSalesPackage();
@@ -121,7 +125,7 @@ export const SalesPackage = () => {
                     )}
                 </section>
             </div>
-            <SalesPackageModal visible={visible} setVisible={setVisible} />
+            <SalesPackageModal visible={visible} setVisible={setVisible} onSuccess={handleSalesPackageSaved}/>
 
 
         </>
