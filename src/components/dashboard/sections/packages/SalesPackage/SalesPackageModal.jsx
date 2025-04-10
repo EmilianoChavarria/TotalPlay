@@ -8,8 +8,9 @@ import { InputText } from 'primereact/inputtext';
 import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
 import { useEffect } from 'react';
 import { SalesPackageService } from '../../../../../services/SalesPackageService';
+import { showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
 
-export const SalesPackageModal = ({ visible, setVisible }) => {
+export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
     // Estado para los paquetes disponibles
     const [availablePackages] = useState([
         {
@@ -81,13 +82,32 @@ export const SalesPackageModal = ({ visible, setVisible }) => {
                 channel_package_name: selectedPackage.name
             };
             console.log('Datos del formulario:', formData);
+            
             try {
                 const response = await SalesPackageService.saveChannel(formData);
-                console.log(response)
+                console.log("Respuesta del servidor:", response);
+        
+                if (response.status === 'CREATED' || response.success) { // Ajusta según la respuesta real de tu API
+                    setVisible(false);
+                    formik.resetForm();
+                    showSuccessAlert(response.message || 'Paquete creado exitosamente', () => {
+                        if (onSuccess) {
+                            onSuccess();
+                        }
+                    });
+                } else {
+                    setVisible(false);
+                    showErrorAlert(response.message || 'Ocurrió un error al crear el paquete', () => {
+                        // Puedes agregar lógica adicional si es necesario
+                        setVisible(true);
+                    });
+                }
             } catch (error) {
-                console.log(error)
+                console.log("Error al crear el paquete:", error);
+                showErrorAlert('Ocurrió un error al procesar la solicitud', () => {
+                    // Puedes agregar lógica adicional si es necesario
+                });
             }
-
         },
     });
 

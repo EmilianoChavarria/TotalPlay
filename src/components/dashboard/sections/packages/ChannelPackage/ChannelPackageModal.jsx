@@ -95,7 +95,6 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
       };
       console.log('Package data to submit:', packageData);
 
-      // Here you would typically send the data to your API
       try {
         const response = await ChannelPackageService.saveChannelPackage(packageData);
         console.log("Respuesta del servidor:", response);

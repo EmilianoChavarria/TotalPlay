@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ClientService } from '../../../../services/ClientService';
+import { ClientModal } from './ClientModal';
 
 export const Contracts = () => {
   const [expandedClient, setExpandedClient] = useState(null);
+  const [visible, setVisible] = useState(false);
 
   // Datos de ejemplo (puedes reemplazar con datos reales de tu API)
   // const clients = [
@@ -163,6 +165,7 @@ export const Contracts = () => {
           </tbody>
         </table>
       </div>
+      <ClientModal visible={visible} setVisible={setVisible}/>
     </>
   );
 };
