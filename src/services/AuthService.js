@@ -16,7 +16,6 @@ export const AuthService = {
             }
 
             const data = await response.json();
-            sessionStorage.setItem("jwt", data.jwt); // Almacena el token
             
             // Mostrar mensaje de éxito
             await Swal.fire({
@@ -53,7 +52,7 @@ export const AuthService = {
     },
 
     getRole: () => {
-        const token = sessionStorage.getItem("jwt");
+        const token = localStorage.getItem("token");
         if (!token) return null;
 
         const payload = JSON.parse(atob(token.split(".")[1])); // Decodifica el token

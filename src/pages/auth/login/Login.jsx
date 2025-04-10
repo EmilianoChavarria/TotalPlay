@@ -38,8 +38,9 @@ export const Login = () => {
         onSubmit: async (values) => {
             console.log('Datos del formulario:', values);
             try {
+                const role = AuthService.getRole();
+                localStorage.setItem('role', role);
                 const response = await AuthService.login(values.email, values.password);
-                console.log('Respuesta del servidor:', response);
                 if (response.jwt) {
                     // Guardar token en localStorage
                     localStorage.setItem('token', response.jwt);
