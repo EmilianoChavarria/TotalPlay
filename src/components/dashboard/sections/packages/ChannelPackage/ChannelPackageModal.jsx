@@ -108,10 +108,7 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
         /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+$/,
         "La descripción del paquete no es válida"
       ),
-    amount: Yup.number()
-      .typeError('La cantidad del paquete no es válida')
-      .required("La cantidad del paquete es obligatoria")
-      .min(1, "La cantidad del paquete no es válida"),
+    
   });
 
   // Configuración de Formik
@@ -119,7 +116,6 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
     initialValues: {
       name: '',
       description: '',
-      amount: '',
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -169,9 +165,8 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
   return (
     <Dialog header="Agregar paquete de canales" visible={visible} className='w-full  md:w-[60vw] xl:w-[60vw] 2xl:w-[40vw]' onHide={() => { if (!visible) return; setVisible(false); }}>
       <form onSubmit={formik.handleSubmit} className='mt-10'>
-        <div className='mt-4 flex flex-col md:flex-row justify-between items-start'>
-          {/* Campo de nombre */}
-          <div className='w-full md:w-[49%]'>
+        {/* Campo de nombre */}
+        <div className='w-full'>
             <FloatLabel >
               <InputText
                 id="name"
@@ -186,24 +181,6 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
               <div className="text-red-500 text-xs mt-1">{formik.errors.name}</div>
             )}
           </div>
-
-          {/* Campo de precio */}
-          <div className='w-full md:w-[49%]'>
-            <FloatLabel >
-              <InputText
-                id="amount"
-                name="amount"
-                className={`border ${formik.touched.amount && formik.errors.amount ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
-                value={formik.values.amount}
-                onChange={(e) => handleChange('amount', e.target.value)}
-              />
-              <label htmlFor="amount">Precio</label>
-            </FloatLabel>
-            {formik.touched.amount && formik.errors.amount && (
-              <div className="text-red-500 text-xs mt-1">{formik.errors.amount}</div>
-            )}
-          </div>
-        </div>
 
         {/* Campo description */}
         <div className={`${formik.touched.name && formik.errors.name ? 'mt-8' : 'mt-6'}`}>
