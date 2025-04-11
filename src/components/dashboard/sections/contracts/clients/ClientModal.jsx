@@ -207,7 +207,10 @@ export const ClientModal = ({ visible, setVisible, onSuccess }) => {
                         <div className="text-red-500 text-xs mt-1">{formik.errors.email}</div>
                     )}
                 </div>
-                <div className={`${formik.touched.email && formik.errors.email ? 'mt-8' : 'mt-7'}`}>
+
+                <div className={`${formik.touched.email && formik.errors.email ? 'mt-8' : 'mt-7'} flex flex-col justify-between items-start md:flex-row`}>
+
+                <div className='w-full md:w-[47%]'>
                     <FloatLabel className='w-full'>
                         <InputText
                             id="phone"
@@ -222,7 +225,7 @@ export const ClientModal = ({ visible, setVisible, onSuccess }) => {
                         <div className="text-red-500 text-xs mt-1">{formik.errors.phone}</div>
                     )}
                 </div>
-                <div className={`${formik.touched.phone && formik.errors.phone ? 'mt-8' : 'mt-7'}`}>
+                <div className='w-full md:w-[47%]'>
                     <FloatLabel className='w-full rounded-md'>
                         <Calendar
                             id="birthdate"
@@ -239,6 +242,8 @@ export const ClientModal = ({ visible, setVisible, onSuccess }) => {
                         <div className="text-red-500 text-xs mt-1">{formik.errors.birthdate}</div>
                     )}
                 </div>
+                </div>
+                
 
                 <div className='mt-8'>
                     <button

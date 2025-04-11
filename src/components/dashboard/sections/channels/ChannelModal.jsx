@@ -25,7 +25,7 @@ export const ChannelModal = ({ visible, setVisible, onSuccess  }) => {
     const validationSchema = Yup.object().shape({
         name: Yup.string()
             .required("El nombre del canal es obligatorio")
-            .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/, "El nombre del canal no es válido")
+            .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ0-9]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ0-9]+)*$/, "El nombre del canal no es válido")
         ,
         description: Yup.string()
             .required("La descripción del canal es obligatoria")

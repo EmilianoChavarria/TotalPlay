@@ -2,58 +2,57 @@ import React, { useEffect, useState } from 'react';
 import { ClientService } from '../../../../services/ClientService';
 import { ClientModal } from './clients/ClientModal';
 import { Button } from 'primereact/button';
+import { Menu } from 'primereact/menu';
+import { AddressModal } from './clients/AddressModal';
 
 export const Contracts = () => {
   const [expandedClient, setExpandedClient] = useState(null);
   const [visible, setVisible] = useState(false);
+  const [visibleD, setVisibleD] = useState(false);
+  const menuRef = React.useRef(null);
 
-  // Datos de ejemplo (puedes reemplazar con datos reales de tu API)
-  // const clients = [
-  //   {
-  //     id: 1,
-  //     name: "John Doe",
-  //     email: "john@example.com",
-  //     phone: "123-456-7890",
-  //     totalContracts: 2,
-  //     contracts: [
-  //       {
-  //         id: 101,
-  //         name: "Premium Bundle",
-  //         status: "ACTIVE",
-  //         price: "$99.99/month",
-  //         started: "2023-01-01",
-  //         address: "123 Main St. City"
-  //       },
-  //       {
-  //         id: 102,
-  //         name: "Basic Internet",
-  //         status: "CANCELLED",
-  //         price: "$49.99/month",
-  //         started: "2022-06-15",
-  //         address: "123 Main St. City"
-  //       }
-  //     ]
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Jane Smith",
-  //     email: "jane@example.com",
-  //     phone: "098-765-4321",
-  //     totalContracts: 1,
-  //     contracts: [
-  //       {
-  //         id: 201,
-  //         name: "Basic Internet",
-  //         status: "ACTIVE",
-  //         price: "$49.99/month",
-  //         started: "2022-05-10",
-  //         address: "456 Oak Ave. Town"
-  //       }
-  //     ]
-  //   }
-  // ];
 
   const [clients, setClients] = useState([]);
+  const [selectedClient, setSelectedClient] = useState(null);
+
+
+  const [user, setUser] = useState({});
+
+  const menuItems = [
+    {
+      label: 'Agregar dirección',
+      icon: 'pi pi-home',
+      command: () => {
+        // Aquí iría la lógica para editar
+        setSelectedClient(user);
+        setVisibleD(true);
+      }
+    },
+    {
+      label: 'Registrar contrato',
+      icon: 'pi pi-plus',
+      command: () => {
+        // Aquí iría la lógica para editar
+        console.log('asd');
+      }
+    },
+    {
+      label: 'Editar',
+      icon: 'pi pi-pencil',
+      command: () => {
+        // Aquí iría la lógica para editar
+        console.log('asd');
+      }
+    },
+    {
+      label: 'Eliminar',
+      icon: 'pi pi-trash',
+      command: () => {
+        // Aquí iría la lógica para eliminar
+        console.log('asd');
+      }
+    }
+  ];
 
   const fetchClients = async () => {
     try {
@@ -126,25 +125,36 @@ export const Contracts = () => {
                   <td className="px-6 py-4">{client.phone}</td>
                   <td className="px-6 py-4">{client.addresses.length}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {/* <button
-                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    <button
+                      className="  text-white rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onClick={(e) => {
                         e.stopPropagation();
                         // Lógica para añadir contrato
-                        console.log('Add contract for', client.name);
+                        setUser({
+                          userId: client.id,
+                          name: client.name,
+                          lastName: client.lastName,
+                          surname: client.surname,
+                        });
+                        menuRef.current.toggle(e)
                       }}
                     >
-                      + Agregar contrato
-                    </button> */}
-                    <div className='flex gap-x-2 items-end justify-center'>
-                      <Button tooltip="Agregar contrato" className=" py-1 bg-green-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2" tooltipOptions={{ position: 'bottom' }} icon="pi pi-plus" />
+                      <i 
+                        className={`pi pi-ellipsis-v p-2 rounded-lg text-gray-800 mx-auto `}
+                        style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}
+                        aria-controls="popup_menu"
+                        aria-haspopup
+                    />
+                    </button>
 
-                      <Button tooltip="Agregar dirección" className=" py-1 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2" tooltipOptions={{ position: 'bottom' }} icon="pi pi-home" />
+                    <Menu
+                      model={menuItems}
+                      popup
+                      ref={menuRef}
+                      id="popup_menu"
+                      className="text-sm"
+                    />
 
-                      <Button tooltip="Agregar editar" className=" py-1 bg-yellow-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2" tooltipOptions={{ position: 'bottom' }} icon="pi pi-pencil" />
-
-                      <Button tooltip="Agregar eliminar" className=" py-1 bg-red-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2" tooltipOptions={{ position: 'bottom' }} icon="pi pi-times" />
-                    </div>
 
                   </td>
                 </tr>
@@ -183,6 +193,8 @@ export const Contracts = () => {
         </table>
       </div>
       <ClientModal visible={visible} setVisible={setVisible} onSuccess={handleClientSave} />
+
+      <AddressModal visibleD={visibleD} setVisibleD={setVisibleD} user={selectedClient} onSuccess={handleClientSave} />
     </>
   );
 };
