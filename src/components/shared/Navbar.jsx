@@ -1,7 +1,11 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext';
 
 export const Navbar = ({ toggleCollapse }) => {
+
+  const { hasRole } = useAuth();
+
   return (
     <div className='border-b border-gray-200 h-[4.3rem] flex items-center justify-between px-4 md:px-10'>
       <div className='flex items-center justify-center'>
@@ -21,7 +25,11 @@ export const Navbar = ({ toggleCollapse }) => {
             className={`pi pi-user mr-2`}
             style={{ fontSize: '1.2rem' }}
           />
-          <span>Admin</span>
+          {hasRole('ADMIN') ? (
+            <span>Admin</span>
+          ) : (
+            <span>Vendedor</span>  
+          )}
         </div>
         <div className='hidden md:block'>
           <Link className='flex items-center border border-white rounded-md p-2 justify-center hover:border-red-600 hover:text-red-700 transition duration-150' to='/'>

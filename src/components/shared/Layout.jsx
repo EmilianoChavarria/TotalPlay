@@ -2,31 +2,36 @@ import React, { useState, useEffect } from "react";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./sidebar";
 import { Outlet } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
-export const Layout = ({ userRole = "admin" }) => {
+
+export const Layout = () => {
     const [collapsed, setCollapsed] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const { hasRole } = useAuth();
 
-    const sidebarItems = {
-        admin: [
+    const getSidebarItems = () => {
+        const baseItems = [
             { name: "Dashboard", link: "/dashboard/home", icon: "pi pi-objects-column" },
-            { name: "Paquetes", link: "/dashboard/packages/channelPackages", icon: "pi pi-box" },
-            { name: "Canales", link: "/dashboard/channels", icon: "pi pi-desktop" },
-            { name: "Contratos", link: "/dashboard/contracts", icon: "pi pi-file" },
-            { name: "Reportes", link: "/dashboard/reports", icon: "pi pi-chart-bar" }
-        ],
-        user: [
-            { name: "Dashboard", link: "/dashboard/home", icon: "pi pi-objects-column" },
-            { name: "Paquetes", link: "/dashboard/packages", icon: "pi pi-box" },
+            { name: "Paquetes", link: "/dashboard/packages/salesPackages", icon: "pi pi-box" },
             { name: "Contratos", link: "/dashboard/contracts", icon: "pi pi-file" }
-        ]
+        ];
+
+        if (hasRole('ADMIN')) {
+            return [
+                ...baseItems,
+                { name: "Canales", link: "/dashboard/channels", icon: "pi pi-desktop" },
+                { name: "Reportes", link: "/dashboard/reports", icon: "pi pi-chart-bar" }
+            ];
+        }
+
+        return baseItems;
     };
 
     const toggleCollapse = () => {
         setCollapsed(!collapsed);
     };
 
-    // Función para cerrar la sidebar en móvil
     const closeSidebarMobile = () => {
         if (isMobile) {
             setCollapsed(true);
@@ -51,21 +56,19 @@ export const Layout = ({ userRole = "admin" }) => {
 
     return (
         <div className="flex h-screen overflow-hidden relative">
-            {/* Sidebar con animación */}
             <div className={`
                 ${isMobile ? 'fixed inset-y-0 left-0 z-50 transform' : 'flex-shrink-0'} 
                 ${collapsed && isMobile ? '-translate-x-full' : 'translate-x-0'}
                 transition-transform duration-300 ease-in-out
             `}>
                 <Sidebar
-                    items={sidebarItems[userRole]}
+                    items={getSidebarItems()}
                     collapsed={collapsed}
                     toggleCollapse={toggleCollapse}
                     closeSidebarMobile={closeSidebarMobile}
                 />
             </div>
 
-            {/* Overlay con animación de opacidad */}
             {isMobile && !collapsed && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
@@ -73,14 +76,12 @@ export const Layout = ({ userRole = "admin" }) => {
                 />
             )}
 
-            {/* Contenido principal con animación de desplazamiento */}
             <div className={`
                 flex-1 flex flex-col overflow-hidden
                 ${isMobile && !collapsed ? 'transform translate-x-64' : 'translate-x-0'}
                 transition-transform duration-300 ease-in-out
             `}>
                 <Navbar
-                    userRole={userRole}
                     toggleCollapse={toggleCollapse}
                     isMobile={isMobile}
                 />

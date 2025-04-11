@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { FloatLabel } from 'primereact/floatlabel';
@@ -7,7 +7,12 @@ import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '../../../services/AuthService';
 
+import { useAuth } from '../../../context/AuthContext';
+
+
 export const Login = () => {
+    const { login } = useAuth();
+
     const navigate = useNavigate();
     const [passwordVisible, setPasswordVisible] = useState(false);
 
@@ -38,19 +43,13 @@ export const Login = () => {
         onSubmit: async (values) => {
             console.log('Datos del formulario:', values);
             try {
-                const role = AuthService.getRole();
-                localStorage.setItem('role', role);
                 const response = await AuthService.login(values.email, values.password);
                 if (response.jwt) {
-                    // Guardar token en localStorage
-                    localStorage.setItem('token', response.jwt);
-                    // Redirigir a la página de dashboard
+                    login(response.jwt); // Usar la función del contexto
                     navigate('/dashboard/home');
                 }
-
             } catch (error) {
                 console.error('Error en el inicio de sesión:', error);
-                
             }
 
         },
@@ -66,6 +65,12 @@ export const Login = () => {
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);
     };
+
+    useEffect(() => {
+        if (localStorage.getItem('token')) {
+            navigate('/dashboard/home');
+        }
+    }, [ navigate]);
 
     return (
         <div className='h-screen w-full bg-gray-100 flex items-center justify-center'>

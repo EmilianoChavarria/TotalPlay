@@ -5,8 +5,10 @@ import { SalesPackageModal } from './SalesPackageModal';
 import { SalesPackageService } from '../../../../../services/SalesPackageService';
 import { useEffect } from 'react';
 import { ChannelListModal } from '../ChannelPackage/ChannelListModal';
+import { useAuth } from '../../../../../context/AuthContext';
 
 export const SalesPackage = () => {
+    const { hasRole } = useAuth();
 
     const [visible, setVisible] = useState(false);
     const [visibleChannel, setVisibleChannel] = useState(false);
@@ -25,7 +27,7 @@ export const SalesPackage = () => {
 
     const handleSalesPackageSaved = () => {
         getSalesPackage(); // Volver a cargar los canales
-      };
+    };
 
     useEffect(() => {
         getSalesPackage();
@@ -37,14 +39,16 @@ export const SalesPackage = () => {
                 {/* Contenedor del encabezado */}
                 <div className='w-full flex flex-col md:flex-row items-center justify-between'>
                     <h2 className='text-2xl font font-semibold whitespace-nowrap'>Gestión de paquetes de ventas</h2>
-                    <button onClick={() => {
-                        setVisible(true);
-                    }} className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition '>
-                        <i className={`pi pi-plus mr-2`}
-                            style={{ fontSize: '1rem', verticalAlign: 'middle' }}
-                        />
-                        Agregar paquete
-                    </button>
+                    {hasRole('ADMIN') && (
+                        <button onClick={() => {
+                            setVisible(true);
+                        }} className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition '>
+                            <i className={`pi pi-plus mr-2`}
+                                style={{ fontSize: '1rem', verticalAlign: 'middle' }}
+                            />
+                            Agregar paquete
+                        </button>
+                    )}
                 </div>
 
                 {/* Contenedor de canales */}
@@ -58,7 +62,6 @@ export const SalesPackage = () => {
                         return (
                             <>
                                 <div key={item.id} className='bg-white p-6 rounded-lg shadow-sm flex flex-col'>
-
                                     {/* Encabezado de card */}
                                     <div className='flex items-center justify-between'>
                                         <div className='flex items-center justify-start'>
@@ -67,9 +70,11 @@ export const SalesPackage = () => {
                                             />
                                             <span className='text-lg font-medium text-gray-800'>{item.name}</span>
                                         </div>
-                                        <i className={`pi pi-ellipsis-v mr-2 p-2 rounded-lg text-gray-800 hover:bg-gray-100 hover:cursor-pointer `}
-                                            style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}
-                                        />
+                                        {hasRole('ADMIN') && (
+                                            <i className={`pi pi-ellipsis-v mr-2 p-2 rounded-lg text-gray-800 hover:bg-gray-100 hover:cursor-pointer `}
+                                                style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}
+                                            />
+                                        )}
                                     </div>
                                     <div className='flex items-center justify-between pt-2 pb-4 border-b border-gray-200'>
                                         <div className='flex items-center justify-start'>
@@ -125,7 +130,7 @@ export const SalesPackage = () => {
                     )}
                 </section>
             </div>
-            <SalesPackageModal visible={visible} setVisible={setVisible} onSuccess={handleSalesPackageSaved}/>
+            <SalesPackageModal visible={visible} setVisible={setVisible} onSuccess={handleSalesPackageSaved} />
 
 
         </>

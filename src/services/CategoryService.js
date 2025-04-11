@@ -1,9 +1,11 @@
 import { BASE_URL, token } from "../config/const";
 
 export const CategoryService = {
+    
 
     // Traer todas las categorías
     getCategories: async () => {
+        console.log(token)
         try {
             const response = await fetch(`${BASE_URL}/channelCategory/`, {
                 method: 'GET',
