@@ -99,13 +99,13 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
     name: Yup.string()
       .required("El nombre del paquete es obligatorio")
       .matches(
-        /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+$/,
+        /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/,
         "El nombre del paquete no es válido"
       ),
     description: Yup.string()
       .required("La descripción del paquete es obligatoria")
       .matches(
-        /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+$/,
+        /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/,
         "La descripción del paquete no es válida"
       ),
     

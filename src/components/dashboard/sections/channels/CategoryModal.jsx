@@ -17,7 +17,7 @@ export const CategoryModal = ({ visibleD, setVisibleD }) => {
             .required("El nombre de la categoría es obligatorio")
             .matches(
                 // Regex de solo letras y números
-                /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+$/,
+                /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/,
                 "El nombre de la categoría no es válida"
             )
 

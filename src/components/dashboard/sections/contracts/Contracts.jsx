@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ClientService } from '../../../../services/ClientService';
 import { ClientModal } from './clients/ClientModal';
+import { Button } from 'primereact/button';
 
 export const Contracts = () => {
   const [expandedClient, setExpandedClient] = useState(null);
@@ -70,6 +71,12 @@ export const Contracts = () => {
     }
   }
 
+
+  const handleClientSave = () => {
+    fetchClients(); // Volver a cargar los canales
+  };
+
+
   useEffect(() => {
     fetchClients();
   }, []);
@@ -119,7 +126,7 @@ export const Contracts = () => {
                   <td className="px-6 py-4">{client.phone}</td>
                   <td className="px-6 py-4">{client.addresses.length}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button
+                    {/* <button
                       className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -128,7 +135,17 @@ export const Contracts = () => {
                       }}
                     >
                       + Agregar contrato
-                    </button>
+                    </button> */}
+                    <div className='flex gap-x-2 items-end justify-center'>
+                      <Button tooltip="Agregar contrato" className=" py-1 bg-green-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2" tooltipOptions={{ position: 'bottom' }} icon="pi pi-plus" />
+
+                      <Button tooltip="Agregar dirección" className=" py-1 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2" tooltipOptions={{ position: 'bottom' }} icon="pi pi-home" />
+
+                      <Button tooltip="Agregar editar" className=" py-1 bg-yellow-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2" tooltipOptions={{ position: 'bottom' }} icon="pi pi-pencil" />
+
+                      <Button tooltip="Agregar eliminar" className=" py-1 bg-red-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2" tooltipOptions={{ position: 'bottom' }} icon="pi pi-times" />
+                    </div>
+
                   </td>
                 </tr>
 
@@ -144,8 +161,8 @@ export const Contracts = () => {
                                 <p className="text-gray-600">{contract.price}</p>
                               </div>
                               <span className={`px-2 py-1 text-xs font-semibold rounded-full ${contract.status === "ACTIVE"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
                                 }`}>
                                 {contract.status}
                               </span>
@@ -165,7 +182,7 @@ export const Contracts = () => {
           </tbody>
         </table>
       </div>
-      <ClientModal visible={visible} setVisible={setVisible}/>
+      <ClientModal visible={visible} setVisible={setVisible} onSuccess={handleClientSave} />
     </>
   );
 };

@@ -16,4 +16,21 @@ export const ClientService = {
             return error;
         }
     },
+
+    saveClient: async (client) => {
+        try {
+            const response = await fetch(`${BASE_URL}/client/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(client),
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            return error;
+        }
+    },
 }

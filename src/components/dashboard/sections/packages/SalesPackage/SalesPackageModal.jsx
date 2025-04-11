@@ -56,7 +56,7 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
     const validationSchema = Yup.object().shape({
         name: Yup.string()
             .required("El nombre es obligatorio")
-            .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+$/, "El nombre del paquete no es válido"),
+            .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/, "El nombre del paquete no es válido"),
         totalAmount: Yup.number()
             .typeError("El precio debe ser un número")
             .required("El precio es obligatoria"),
