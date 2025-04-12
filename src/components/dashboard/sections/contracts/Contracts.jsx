@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { ClientService } from '../../../../services/ClientService';
+import { ContractService } from '../../../../services/ContractService'; // Asegúrate de importar el servicio
 import { ClientModal } from './clients/ClientModal';
 import { Menu } from 'primereact/menu';
 import { AddressManageModals } from './clients/AddressManageModal';
 import { AddressModal } from './clients/AddressModal';
 import { ContractModal } from './ContractModal';
+import { Button } from 'primereact/button';
 
 export const Contracts = () => {
   const [expandedClient, setExpandedClient] = useState(null);
@@ -12,15 +14,13 @@ export const Contracts = () => {
   const [visibleD, setVisibleD] = useState(false);
   const [visibleG, setVisibleG] = useState(false);
   const [visibleContract, setVisibleContract] = useState(false);
-
+  const [clientContracts, setClientContracts] = useState({}); // Almacenará contratos por cliente
+  const [loadingContracts, setLoadingContracts] = useState({}); // Estado de carga por cliente
 
   const menuRef = React.useRef(null);
 
-
   const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState(null);
-
-
   const [user, setUser] = useState({});
 
   const menuItems = [
@@ -28,7 +28,6 @@ export const Contracts = () => {
       label: 'Agregar dirección',
       icon: 'pi pi-plus-circle',
       command: () => {
-        // Aquí iría la lógica para editar
         setSelectedClient(user);
         setVisibleD(true);
       }
@@ -37,7 +36,6 @@ export const Contracts = () => {
       label: 'Direcciones',
       icon: 'pi pi-home',
       command: () => {
-        // Aquí iría la lógica para editar
         setSelectedClient(user);
         setVisibleG(true);
       }
@@ -46,7 +44,6 @@ export const Contracts = () => {
       label: 'Registrar contrato',
       icon: 'pi pi-plus',
       command: () => {
-        // Aquí iría la lógica para editar
         setVisibleContract(true);
       }
     },
@@ -54,7 +51,6 @@ export const Contracts = () => {
       label: 'Editar',
       icon: 'pi pi-pencil',
       command: () => {
-        // Aquí iría la lógica para editar
         console.log('asd');
       }
     },
@@ -62,7 +58,6 @@ export const Contracts = () => {
       label: 'Eliminar',
       icon: 'pi pi-trash',
       command: () => {
-        // Aquí iría la lógica para eliminar
         console.log('asd');
       }
     }
@@ -71,7 +66,6 @@ export const Contracts = () => {
   const fetchClients = async () => {
     try {
       const response = await ClientService.gteClients();
-      console.log(response)
       if (response.data && Array.isArray(response.data)) {
         setClients(response.data);
       } else {
@@ -84,26 +78,51 @@ export const Contracts = () => {
     }
   }
 
-
-  const handleClientSave = () => {
-    fetchClients(); // Volver a cargar los canales
+  const fetchContractsForClient = async (clientId) => {
+    try {
+      setLoadingContracts(prev => ({ ...prev, [clientId]: true }));
+      const response = await ContractService.findbyClientId(clientId);
+      console.log(response);
+      setClientContracts(prev => ({
+        ...prev,
+        [clientId]: response.data || []
+      }));
+    } catch (error) {
+      console.error(`Error al obtener contratos para el cliente ${clientId}:`, error);
+      setClientContracts(prev => ({
+        ...prev,
+        [clientId]: []
+      }));
+    } finally {
+      setLoadingContracts(prev => ({ ...prev, [clientId]: false }));
+    }
   };
 
+  const handleClientSave = () => {
+    fetchClients();
+  };
 
   useEffect(() => {
     fetchClients();
   }, []);
 
-  const toggleClient = (clientId) => {
-    setExpandedClient(expandedClient === clientId ? null : clientId);
+  const toggleClient = async (clientId) => {
+    if (expandedClient === clientId) {
+      setExpandedClient(null);
+    } else {
+      // Si no tenemos los contratos de este cliente, los cargamos
+      if (!clientContracts[clientId]) {
+        await fetchContractsForClient(clientId);
+      }
+      setExpandedClient(clientId);
+    }
   };
 
   return (
     <>
-      {/* Contenedor del encabezado */}
       <div className='w-full flex flex-col md:flex-row items-center justify-between'>
-        <h2 className='text-2xl font font-semibold whitespace-nowrap' >Gestión de contratos</h2>
-        <button className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition ' onClick={() => setVisible(true)}>
+        <h2 className='text-2xl font font-semibold whitespace-nowrap'>Gestión de contratos</h2>
+        <button className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition' onClick={() => setVisible(true)}>
           <i className={`pi pi-plus mr-2`}
             style={{ fontSize: '1rem', verticalAlign: 'middle' }}
           />
@@ -111,7 +130,6 @@ export const Contracts = () => {
         </button>
       </div>
 
-      {/* Contenido */}
       <div className="overflow-x-auto bg-white p-4 rounded-md shadow mt-10">
         <table className="min-w-full text-sm text-gray-500">
           <thead className="bg-gray-50">
@@ -140,10 +158,9 @@ export const Contracts = () => {
                   <td className="px-6 py-4">{client.addresses.length}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <button
-                      className="  text-white rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="text-white rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Lógica para añadir contrato
                         setUser({
                           userId: client.id,
                           name: client.name,
@@ -157,7 +174,7 @@ export const Contracts = () => {
                       }}
                     >
                       <i
-                        className={`pi pi-ellipsis-v p-2 rounded-lg text-gray-800 mx-auto `}
+                        className={`pi pi-ellipsis-v p-2 rounded-lg text-gray-800 mx-auto`}
                         style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}
                         aria-controls="popup_menu"
                         aria-haspopup
@@ -171,35 +188,57 @@ export const Contracts = () => {
                       id="popup_menu"
                       className="text-sm"
                     />
-
-
                   </td>
                 </tr>
 
                 {expandedClient === client.id && (
                   <tr>
-                    <td colSpan="5" className="px-6 py-4">
+                    <td colSpan="6" className="px-6 py-4">
                       <div className="space-y-4 pl-8">
-                        {client.contracts.map((contract) => (
-                          <div key={contract.id} className="border-l-4 border-blue-500 pl-4 py-3">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h3 className="font-medium text-lg">{contract.name}</h3>
-                                <p className="text-gray-600">{contract.price}</p>
-                              </div>
-                              <span className={`px-2 py-1 text-xs font-semibold rounded-full ${contract.status === "ACTIVE"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                                }`}>
-                                {contract.status}
-                              </span>
-                            </div>
-                            <div className="mt-2 text-sm text-gray-500">
-                              <p><span className="font-medium">Started:</span> {contract.started}</p>
-                              <p><span className="font-medium">Address:</span> {contract.address}</p>
-                            </div>
+                        {loadingContracts[client.id] ? (
+                          <div className="flex justify-center items-center py-4">
+                            <i className="pi pi-spinner pi-spin mr-2"></i>
+                            Cargando contratos...
                           </div>
-                        ))}
+                        ) : clientContracts[client.id]?.length > 0 ? (
+                          clientContracts[client.id].map((contract) => (
+                            <div key={contract.id} className="border-l-4 border-blue-500 pl-4 py-3 shadow-sm">
+                              <div className="flex justify-between items-start">
+                                <div className="mt-2 text-sm text-gray-500">
+                                  <p className='text-xl font-bold'>{contract.salesPackageEntity.name}</p>
+                                  <p><span className="font-medium">Contratado el:</span> {contract.creationDate}</p>
+                                  <p><span className="font-medium">Dirección:</span> {contract.address.name}
+                                    <p>{contract.address.street}, #{contract.address.number}, {contract.address.city}, {contract.address.state}, C.P. {contract.address.zipCode}</p>
+                                  </p>
+                                  {/* <p><span className="font-medium">Address:</span> {contract.address}</p> */}
+                                </div>
+                                <div className='flex'>
+                                  <div className='flex flex-col gap-y-2'>
+                                    <span className={`px-2 py-1 text-xs w-fit font-semibold rounded-full ${contract.status === true
+                                      ? "bg-green-100 text-green-800"
+                                      : "bg-red-100 text-red-800"
+                                      }`}>
+                                      {contract.status === true ? "Activo" : "Inactivo"}
+                                    </span>
+                                    <span className='text-xl font-bold text-blue-500'>
+                                      ${contract.salesPackageEntity.totalAmount}/mes
+                                    </span>
+                                  </div>
+                                  <div className='flex gap-x-2 items-center justify-center ml-4'>
+                                    <Button tooltip="Cancelar contrato" tooltipOptions={{ position: 'bottom' }}>
+                                      <i className="pi pi-times-circle text-red-500" style={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-4 text-gray-500">
+                            No se encontraron contratos para este cliente
+                          </div>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -210,13 +249,9 @@ export const Contracts = () => {
         </table>
       </div>
       <ClientModal visible={visible} setVisible={setVisible} onSuccess={handleClientSave} />
-
       <AddressModal visibleD={visibleD} setVisibleD={setVisibleD} user={selectedClient} onSuccess={handleClientSave} />
-
       <AddressManageModals visibleD={visibleG} setVisibleD={setVisibleG} user={user} />
-
       <ContractModal user={user} visible={visibleContract} setVisible={setVisibleContract} />
-
     </>
   );
 };

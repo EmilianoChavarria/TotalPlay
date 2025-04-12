@@ -16,5 +16,21 @@ export const ContractService = {
         }
 
         return await response.json();
-    }
+    },
+
+    findbyClientId: async (clientId) => {
+        const response = await fetch(`${BASE_URL}/contract/findByClient/${clientId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Error fetching contracts');
+        }
+
+        return await response.json();
+    },
 }
