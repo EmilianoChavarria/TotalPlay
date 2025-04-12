@@ -16,7 +16,7 @@ export const AuthService = {
             }
 
             const data = await response.json();
-            
+
             // Mostrar mensaje de éxito
             await Swal.fire({
                 icon: 'success',
@@ -25,7 +25,7 @@ export const AuthService = {
                 timer: 1300,
                 showConfirmButton: false
             });
-            
+
             return data;
         } catch (error) {
             // Mostrar mensaje de error
@@ -58,4 +58,44 @@ export const AuthService = {
         const payload = JSON.parse(atob(token.split(".")[1])); // Decodifica el token
         return payload.roles[0]; // Retorna el primer rol
     },
+
+    sendEmail: async (email) => {
+        console.log(JSON.stringify({ email }));
+        try {
+            const response = await fetch(`http://localhost:8080/auth/forward-password`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({ email }) // aquí va el correo
+            });
+            console.log(response);
+
+            if (!response.ok) {
+                throw new Error("Error al enviar el correo");
+            }
+
+            const data = await response.json();
+
+            // Mostrar mensaje de éxito
+            await Swal.fire({
+                icon: 'success',
+                title: '¡Correo enviado!',
+                text: 'Revisa tu bandeja de entrada para restablecer tu contraseña.',
+                timer: 1300,
+                showConfirmButton: false
+            });
+
+            return data;
+        } catch (error) {
+            // Mostrar mensaje de error
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: error.message || 'Ocurrió un error al enviar el correo',
+                confirmButtonText: 'Entendido'
+            });
+            throw error;
+        }
+    }
 };

@@ -12,6 +12,8 @@ import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../Cus
 export const Channels = () => {
 
   const [visible, setVisible] = useState(false);
+  const [channelToEdit, setChannelToEdit] = useState(null);
+
 
   const [channels, setChannels] = useState([]);
   const [loadingChannels, setLoadingChannels] = useState(false);
@@ -70,6 +72,12 @@ export const Channels = () => {
       setLoadingChannels(false);
     }
   };
+
+  const handleEditChannel = (channel) => {
+    setChannelToEdit(channel);
+    setVisible(true);
+  };
+
 
   const deleteChannel = async (id) => {
     showConfirmAlert(
@@ -187,7 +195,7 @@ export const Channels = () => {
                     <td className="px-6 py-4">{channel.number}</td>
                     <td className="px-6 py-4 ">{channel.category.name}</td>
                     <td className="px-6 py-4 flex gap-x-2">
-                      <button>editar</button>
+                      <button onClick={() => handleEditChannel(channel)}>editar</button>
                       <button onClick={() => {
                         deleteChannel(channel.id);
                       }}>eliminar</button>
@@ -208,6 +216,7 @@ export const Channels = () => {
         visible={visible}
         setVisible={setVisible}
         onSuccess={handleChannelSaved}
+        channelToEdit={channelToEdit}
       />
 
 

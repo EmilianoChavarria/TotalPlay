@@ -34,6 +34,21 @@ export const SalesPackageService = {
             return error;
         }
     },
+
+    deleteSalesPackage: async (id) => {
+        try {
+            const response = await fetch(`${BASE_URL}/salesPackage/delete/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return await response.json();
+        } catch (error) {
+            return error;
+        }
+    },
     
 
 }

@@ -11,12 +11,16 @@ import { ChannelPackage } from '../components/dashboard/sections/packages/Channe
 import { Login } from '../pages/auth/login/Login';
 import { Page404 } from '../pages/Page404';
 import { ProtectedRoute } from './ProtectedRoute';
+import { ForgotPassword } from '../pages/auth/ForgotPassword';
+import { NewPassword } from '../pages/auth/NewPassword';
 
 export const AppRoutes = () => {
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/new-password" element={<NewPassword />} />
                 <Route path="/not-found" element={<Page404 />} />
                 <Route
                     path="/dashboard"

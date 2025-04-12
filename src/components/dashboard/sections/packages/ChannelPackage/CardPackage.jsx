@@ -1,106 +1,122 @@
-import React from 'react'
-import { useState } from 'react'
-import { ChannelListModal } from './ChannelListModal'
-import { Menu } from 'primereact/menu'; // Importa el componente Menu de PrimeReact
+import React from 'react';
+import { useState } from 'react';
+import { ChannelListModal } from './ChannelListModal';
+import { Menu } from 'primereact/menu';
 import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
 import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
-export const CardPackage = ({ channelPackage }) => {
-    const [visible, setVisible] = useState(false)
-    const [channelList, setChannelList] = useState([]);
-    const menuRef = React.useRef(null); // Referencia para el menú
+export const CardPackage = ({ channelPackage, onEdit, onDeleteSuccess }) => {
+    const [visibleListModal, setVisibleListModal] = useState(false);
+    const menuRef = React.useRef(null);
 
-    const deleteChannelpackage = async (id) => {
-        showConfirmAlert(
-          '¿Estás seguro de que deseas eliminar este paquete?',
-          async () => {
-            try {
-              const response = await ChannelPackageService.deleteChannelPackage(id);
-              console.log(response)
-              if (response.status === 'OK') {
-                showSuccessAlert(response.message, () => {
-                });
-              } else {
-                showErrorAlert(response.message || 'Ocurrió un error al eliminar el paquete de canal');
-              }
-            } catch (error) {
-              console.error("Error al eliminar el paquete de canal:", error);
-              showErrorAlert('Ocurrió un error de conexión con el servidor');
+    // Manejar eliminación del paquete
+    const handleDelete = async () => {
+        confirmDialog({
+            message: '¿Estás seguro de que deseas eliminar este paquete?',
+            header: 'Confirmar eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptClassName: 'p-button-danger',
+            accept: async () => {
+                try {
+                    const response = await ChannelPackageService.deleteChannelPackage(channelPackage.id);
+                    
+                    if (response.status === 'OK') {
+                        showSuccessAlert(response.message);
+                        if (onDeleteSuccess) onDeleteSuccess();
+                    } else {
+                        showErrorAlert(response.message || 'Error al eliminar el paquete');
+                    }
+                } catch (error) {
+                    console.error("Error al eliminar:", error);
+                    showErrorAlert('Error de conexión con el servidor');
+                }
+            },
+            reject: () => {
+                console.log('Eliminación cancelada');
             }
-          },
-          () => {
-            // Callback para cuando el usuario cancela
-            console.log('Eliminación cancelada por el usuario');
-          }
-        );
-      };
+        });
+    };
 
-    // Elementos del menú
+    // Elementos del menú contextual
     const menuItems = [
         {
             label: 'Editar',
             icon: 'pi pi-pencil',
             command: () => {
-                // Aquí iría la lógica para editar
-                console.log('Editar paquete:', channelPackage.id);
+                if (onEdit) onEdit(channelPackage);
             }
         },
         {
             label: 'Eliminar',
             icon: 'pi pi-trash',
-            command: () => {
-                // Aquí iría la lógica para eliminar
-                console.log('Eliminar paquete:', channelPackage.id);
-                deleteChannelpackage(channelPackage.id);
-            }
+            command: () => handleDelete()
         }
     ];
 
     return (
         <>
-            <div className='bg-white h-fit rounded-lg py-6 px-4 shadow-sm'>
+            <ConfirmDialog />
+            
+            <div className='bg-white h-fit rounded-lg py-6 px-4 shadow-sm hover:shadow-md transition-shadow'>
                 {/* Encabezado de la card */}
                 <div className='flex items-center justify-between'>
-                    <span className='text-lg font-medium text-gray-800'>{channelPackage.name}</span>
-                    <i 
-                        className={`pi pi-ellipsis-v mr-2 p-2 rounded-lg text-gray-800 hover:bg-gray-100 hover:cursor-pointer`}
-                        style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}
-                        onClick={(e) => menuRef.current.toggle(e)} // Muestra el menú al hacer clic
-                        aria-controls="popup_menu"
+                    <span className='text-lg font-medium text-gray-800 truncate max-w-[70%]' 
+                          title={channelPackage.name}>
+                        {channelPackage.name}
+                    </span>
+                    
+                    {/* Botón de menú contextual */}
+                    <button
+                        className='p-2 rounded-lg text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        onClick={(e) => menuRef.current.toggle(e)}
+                        aria-label="Opciones del paquete"
+                        aria-controls="package_menu"
                         aria-haspopup
-                    />
-                    {/* Menú flotante */}
+                    >
+                        <i className='pi pi-ellipsis-v' style={{ fontSize: '0.9rem' }} />
+                    </button>
+                    
+                    {/* Menú contextual */}
                     <Menu 
                         model={menuItems} 
                         popup 
                         ref={menuRef} 
-                        id="popup_menu"
-                        className="text-sm"
+                        id="package_menu"
+                        className="text-sm shadow-lg"
                     />
                 </div>
-                {/* body de la card */}
+                
+                {/* Cuerpo de la card */}
                 <div className='flex flex-col mt-3 gap-y-3'>
-                    <span className='text-gray-800 font-light text-base'>{channelPackage.description}</span>
-                    <span className='text-gray-800 font-light text-base'>{channelPackage.channels.length} canales incluidos</span>
-                    <button 
-                        onClick={() => setVisible(true)} 
-                        className='w-full border border-gray-200 flex items-center justify-center rounded-lg text-sm text-gray-700 hover:bg-gray-100 transition'
-                    >
-                        <i 
-                            className={`pi pi-eye p-2 rounded-lg text-gray-800 hover:bg-gray-100 hover:cursor-pointer`}
-                            style={{ fontSize: '1rem', verticalAlign: 'middle' }}
-                        />
-                        Ver listado de canales
-                    </button>
+                    <p className='text-gray-600 text-base line-clamp-2' title={channelPackage.description}>
+                        {channelPackage.description || 'Sin descripción'}
+                    </p>
+                    
+                    <div className='flex items-center justify-between'>
+                        <span className='text-gray-700 text-sm'>
+                            {channelPackage.channels.length} canales incluidos
+                        </span>
+                        
+                        <button 
+                            onClick={() => setVisibleListModal(true)} 
+                            className='flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors'
+                            aria-label={`Ver canales del paquete ${channelPackage.name}`}
+                        >
+                            <i className='pi pi-eye' style={{ fontSize: '1rem' }} />
+                            Ver canales
+                        </button>
+                    </div>
                 </div>
             </div>
 
+            {/* Modal para ver la lista de canales */}
             <ChannelListModal 
-                visible={visible} 
-                setVisible={setVisible} 
+                visible={visibleListModal} 
+                setVisible={setVisibleListModal} 
                 packageName={channelPackage.name} 
                 channelList={channelPackage.channels}
             />
         </>
-    )
-}
+    );
+};

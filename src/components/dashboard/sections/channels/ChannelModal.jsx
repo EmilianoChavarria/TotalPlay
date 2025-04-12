@@ -14,7 +14,7 @@ import { ChannelService } from '../../../../services/ChannelService';
 import { CategoryService } from '../../../../services/CategoryService';
 import Swal from 'sweetalert2';
 
-export const ChannelModal = ({ visible, setVisible, onSuccess  }) => {
+export const ChannelModal = ({ visible, setVisible, onSuccess, channelToEdit }) => {
     const [visibleD, setVisibleD] = useState(false);
     const [categories, setCategories] = useState([]);
     const [filteredCategories, setFilteredCategories] = useState([]);
@@ -73,8 +73,29 @@ export const ChannelModal = ({ visible, setVisible, onSuccess  }) => {
     useEffect(() => {
         if (visible) {
             fetchCategories();
+
+            // Si hay un canal para editar, cargar sus datos
+            if (channelToEdit) {
+                formik.setValues({
+                    name: channelToEdit.name,
+                    description: channelToEdit.description,
+                    number: channelToEdit.number,
+                    category: channelToEdit.category,
+                    logo: channelToEdit.logoBean?.image
+                        ? `data:image/jpeg;base64,${channelToEdit.logoBean.image}`
+                        : null
+                });
+
+                if (channelToEdit.logoBean?.image) {
+                    setPreviewImage(`data:image/jpeg;base64,${channelToEdit.logoBean.image}`);
+                }
+            }
+        } else {
+            // Limpiar el formulario cuando se cierra el modal
+            formik.resetForm();
+            setPreviewImage(null);
         }
-    }, [visible]);
+    }, [visible, channelToEdit]);
 
     // Actualizar categorías cuando se cierra el modal de categoría
     const handleCategoryModalClose = () => {
@@ -157,14 +178,39 @@ export const ChannelModal = ({ visible, setVisible, onSuccess  }) => {
         validationSchema,
         onSubmit: async (values) => {
             const formData = new FormData();
+
+            // Adjunta todos los campos como strings
             formData.append('name', values.name);
             formData.append('description', values.description);
-            formData.append('number', values.number);
-            formData.append('categoryId', values.category.id);
-            formData.append('image', values.logo);
+            formData.append('number', values.number.toString());
+            formData.append('categoryId', values.category.id.toString());
+
+            // Manejo de la imagen
+            if (values.logo instanceof File) {
+                formData.append('image', values.logo);
+            } else if (channelToEdit && !(values.logo instanceof File)) {
+                formData.append('keepImage', 'true');
+            }
+
+            // Depuración: Verifica el contenido del FormData
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
 
             try {
-                const response = await ChannelService.saveChannel(formData);
+                let response;
+
+                if (channelToEdit) {
+                    // Llamada para actualizar
+                    console.log(formData);
+                    formData.append('id', channelToEdit.id.toString());
+
+                    response = await ChannelService.updateChannel(channelToEdit.id, formData);
+                } else {
+                    // Llamada para crear
+                    response = await ChannelService.saveChannel(formData);
+                }
+
                 console.log("Respuesta del servidor:", response);
 
                 if (response.status === 'OK') {
@@ -176,6 +222,7 @@ export const ChannelModal = ({ visible, setVisible, onSuccess  }) => {
                         title: 'Éxito',
                         text: response.message,
                     });
+
                     if (onSuccess) {
                         onSuccess();
                     }
@@ -187,13 +234,11 @@ export const ChannelModal = ({ visible, setVisible, onSuccess  }) => {
                         title: 'Error, inténtelo nuevamente',
                         text: response.message || 'Hubo un problema al guardar el canal',
                     }).then(() => {
-                        setVisible(true); 
+                        setVisible(true);
                     });
                 }
-
-
             } catch (error) {
-                console.log("Error al crear el canal:", error);
+                console.log("Error al crear/actualizar el canal:", error);
 
                 Swal.fire({
                     icon: 'error',
@@ -202,9 +247,6 @@ export const ChannelModal = ({ visible, setVisible, onSuccess  }) => {
                 });
             }
         }
-
-
-
     });
 
     // Handler para cambios en los inputs
@@ -225,7 +267,7 @@ export const ChannelModal = ({ visible, setVisible, onSuccess  }) => {
     return (
         <>
             <Dialog
-                header="Agregar canal"
+                header={channelToEdit ? "Editar canal" : "Agregar canal"}
                 visible={visible}
                 className='w-full md:w-[40vw]'
                 onHide={() => {

@@ -44,15 +44,22 @@ export const Login = () => {
             console.log('Datos del formulario:', values);
             try {
                 const response = await AuthService.login(values.email, values.password);
+                console.log('Respuesta del servidor:', response);
+        
                 if (response.jwt) {
-                    login(response.jwt); // Usar la función del contexto
-                    navigate('/dashboard/home');
+                    login(response.jwt); // Guardas el token en contexto
+        
+                    if (response.temporal === "true") {
+                        navigate('/new-password'); // Redirige si la contraseña es temporal
+                    } else {
+                        navigate('/dashboard/home'); // Redirige normalmente
+                    }
                 }
             } catch (error) {
                 console.error('Error en el inicio de sesión:', error);
             }
-
         },
+        
     });
 
     // Handler para cambios en los inputs
@@ -117,6 +124,9 @@ export const Login = () => {
                         {formik.touched.password && formik.errors.password && (
                             <div className="text-red-500 text-xs mt-1">{formik.errors.password}</div>
                         )}
+                    </div>
+                    <div className='mt-4 text-sm text-center'>
+                        ¿Has olvidado tu contraseña? <a href="/forgot-password" className='text-blue-500 hover:text-blue-600'>Recuperar</a>
                     </div>
 
                     <div className='mt-8'>

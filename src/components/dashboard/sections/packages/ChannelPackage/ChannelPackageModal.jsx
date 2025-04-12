@@ -19,7 +19,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { CategoryService } from '../../../../../services/CategoryService';
 
 
-export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
+export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToEdit }) => {
 
   const [selectedChannels, setSelectedChannels] = useState([]);
 
@@ -42,19 +42,24 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
   // -----------------------------------------------------------------------------------------------
 
 
+  // Obtener canales disponibles (excluyendo los ya seleccionados)
   const fetchChannels = async () => {
-
     try {
       const response = await ChannelService.getAllChannels();
-      console.log(response)
       if (response.data && Array.isArray(response.data)) {
-        setChannels(response.data);
+        // Si estamos editando, filtrar los canales que ya están en el paquete
+        const availableChannels = packageToEdit
+          ? response.data.filter(channel =>
+            !packageToEdit.channels.some(c => c.id === channel.id)
+          )
+          : response.data;
+
+        setChannels(availableChannels);
       } else {
-        console.error("Formato de datos inesperado:", response);
         setChannels([]);
       }
     } catch (error) {
-      console.error("Error al obtener las categorías:", error);
+      console.error("Error al obtener canales:", error);
       setChannels([]);
     }
   };
@@ -78,8 +83,23 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
     if (visible) {
       fetchChannels();
       fetchCategories();
+
+      // Si estamos editando, cargar los canales seleccionados
+      if (packageToEdit) {
+        formik.setValues({
+          name: packageToEdit.name,
+          description: packageToEdit.description
+        });
+
+        // Establecer canales seleccionados
+        setSelectedChannels(packageToEdit.channels || []);
+      } else {
+        // Limpiar para creación
+        formik.resetForm();
+        setSelectedChannels([]);
+      }
     }
-  }, [visible]);
+  }, [visible, packageToEdit]);
 
 
   // Agrega el canal a la segunda lista
@@ -95,63 +115,53 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
   };
 
   // Esto es para el formulario
-  const validationSchema = Yup.object().shape({
-    name: Yup.string()
-      .required("El nombre del paquete es obligatorio")
-      .matches(
-        /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/,
-        "El nombre del paquete no es válido"
-      ),
-    description: Yup.string()
-      .required("La descripción del paquete es obligatoria")
-      .matches(
-        /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/,
-        "La descripción del paquete no es válida"
-      ),
-    
-  });
-
-  // Configuración de Formik
   const formik = useFormik({
     initialValues: {
       name: '',
       description: '',
     },
-    validationSchema,
+    validationSchema: Yup.object().shape({
+      name: Yup.string()
+        .required("El nombre del paquete es obligatorio")
+        .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/, "Nombre no válido"),
+      description: Yup.string()
+        .required("La descripción es obligatoria")
+        .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/, "Descripción no válida"),
+    }),
     onSubmit: async (values) => {
-      console.log('Datos del formulario:', values);
       const packageData = {
         ...values,
         channels: selectedChannels.map(c => ({ id: c.id }))
       };
-      console.log('Package data to submit:', packageData);
 
       try {
-        const response = await ChannelPackageService.saveChannelPackage(packageData);
-        console.log("Respuesta del servidor:", response);
-        // setVisible(false);
+        let response;
 
-        if (response.status === 'CREATED') {
+        if (packageToEdit) {
+          // Llamada para actualizar
+          response = await ChannelPackageService.updateChannelPackage(
+            packageToEdit.id,
+            packageData
+          );
+        } else {
+          // Llamada para crear
+          response = await ChannelPackageService.saveChannelPackage(packageData);
+        }
+
+        if (response.status === 'OK' || response.status === 'CREATED') {
           setVisible(false);
           formik.resetForm();
           setSelectedChannels([]);
+
           showSuccessAlert(response.message, () => {
-            if (onSuccess) {
-              onSuccess();
-            }
+            if (onSuccess) onSuccess();
           });
         } else {
-          setVisible(false);
-          setSelectedChannels([]);
-          showErrorAlert(response.message || 'Ocurrió un error al crear el paquete', () => {
-            setVisible(true);
-          }
-
-          );
+          showErrorAlert(response.message || 'Ocurrió un error');
         }
-
       } catch (error) {
-        console.log("Error al crear el paquete:", error);
+        console.error("Error al guardar el paquete:", error);
+        showErrorAlert('Error de conexión con el servidor');
       }
     },
   });
@@ -163,24 +173,24 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess }) => {
   };
 
   return (
-    <Dialog header="Agregar paquete de canales" visible={visible} className='w-full  md:w-[60vw] xl:w-[60vw] 2xl:w-[40vw]' onHide={() => { if (!visible) return; setVisible(false); }}>
+    <Dialog header={packageToEdit ? "Editar paquete de canales" : "Agregar paquete de canales"}  visible={visible} className='w-full  md:w-[60vw] xl:w-[60vw] 2xl:w-[40vw]' onHide={() => { if (!visible) return; setVisible(false); }}>
       <form onSubmit={formik.handleSubmit} className='mt-10'>
         {/* Campo de nombre */}
         <div className='w-full'>
-            <FloatLabel >
-              <InputText
-                id="name"
-                name="name"
-                className={`border ${formik.touched.name && formik.errors.name ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
-                value={formik.values.name}
-                onChange={(e) => handleChange('name', e.target.value)}
-              />
-              <label htmlFor="name">Nombre del paquete</label>
-            </FloatLabel>
-            {formik.touched.name && formik.errors.name && (
-              <div className="text-red-500 text-xs mt-1">{formik.errors.name}</div>
-            )}
-          </div>
+          <FloatLabel >
+            <InputText
+              id="name"
+              name="name"
+              className={`border ${formik.touched.name && formik.errors.name ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+              value={formik.values.name}
+              onChange={(e) => handleChange('name', e.target.value)}
+            />
+            <label htmlFor="name">Nombre del paquete</label>
+          </FloatLabel>
+          {formik.touched.name && formik.errors.name && (
+            <div className="text-red-500 text-xs mt-1">{formik.errors.name}</div>
+          )}
+        </div>
 
         {/* Campo description */}
         <div className={`${formik.touched.name && formik.errors.name ? 'mt-8' : 'mt-6'}`}>

@@ -34,6 +34,28 @@ export const ChannelService = {
         }
     },
 
+    updateChannel: async (id, formData) => {
+        try {
+            
+            formData.append('id', id.toString());
+    
+            const response = await fetch(`${BASE_URL}/channel/updateImg`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    
+                },
+                body: formData 
+            });
+    
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Error en updateChannel:", error);
+            throw error; 
+        }
+    },
+
     deleteChannel: async (id) => {
         try {
             const response = await fetch(`${BASE_URL}/channel/delete/${id}`, {

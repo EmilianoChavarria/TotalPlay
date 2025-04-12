@@ -35,9 +35,31 @@ export const ChannelPackageService = {
         }
     },
 
+    updateChannelPackage: async (id, channelPackage) => {
+        const data = {
+            ...channelPackage,
+            id: id
+        }
+        console.log(data);
+        try {
+            const response = await fetch(`${BASE_URL}/channelPackage/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+
+            })
+            return await response.json();
+        } catch (error) {
+            return error;
+        }
+    },
+
     deleteChannelPackage: async (id) => {
         try {
-            const response = await fetch(`${BASE_URL}/channelPackage/${id}`, {
+            const response = await fetch(`${BASE_URL}/channelPackage/delete/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
