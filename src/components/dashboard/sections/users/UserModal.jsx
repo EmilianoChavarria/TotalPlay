@@ -5,10 +5,14 @@ import { FloatLabel } from 'primereact/floatlabel';
 import * as Yup from 'yup';
 import React from 'react';
 import { Calendar } from 'primereact/calendar';
+import { showErrorAlert, showSuccessAlert } from '../../../CustomAlerts';
+import { ClientService } from '../../../../services/ClientService';
+import moment from 'moment';
 
-export const UserModal = ({ visible, setVisible, onSuccess }) => {
+export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
+    const isEditMode = !!userToEdit;
+
     const validationSchema = Yup.object().shape({
-
         firstName: Yup.string()
             .required("El nombre es obligatorio")
             .min(2, "Mínimo 2 caracteres")
@@ -27,13 +31,21 @@ export const UserModal = ({ visible, setVisible, onSuccess }) => {
                 /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                 "El correo no es válido"
             ),
-        password: Yup.string()
-            .required("La contraseña es obligatoria")
-            .min(8, "Mínimo 8 caracteres")
-            .matches(
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.,:;¿¡\-_+=#~()[\]{}|^<>/\\])[A-Za-z\d@$!%*?&.,:;¿¡\-_+=#~()[\]{}|^<>/\\]{8,}$/,
-                "Debe contener al menos una mayúscula, una minúscula, un número y un carácter especial"
-            ),
+        password: isEditMode
+            ? Yup.string()
+                .notRequired()
+                .min(8, "Mínimo 8 caracteres")
+                .matches(
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.,:;¿¡\-_+=#~()[\]{}|^<>/\\])[A-Za-z\d@$!%*?&.,:;¿¡\-_+=#~()[\]{}|^<>/\\]{8,}$/,
+                    "Debe contener al menos una mayúscula, una minúscula, un número y un carácter especial"
+                )
+            : Yup.string()
+                .required("La contraseña es obligatoria")
+                .min(8, "Mínimo 8 caracteres")
+                .matches(
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.,:;¿¡\-_+=#~()[\]{}|^<>/\\])[A-Za-z\d@$!%*?&.,:;¿¡\-_+=#~()[\]{}|^<>/\\]{8,}$/,
+                    "Debe contener al menos una mayúscula, una minúscula, un número y un carácter especial"
+                ),
         rfc: Yup.string()
             .required("El RFC es obligatorio")
             .matches(
@@ -45,13 +57,8 @@ export const UserModal = ({ visible, setVisible, onSuccess }) => {
                 'El RFC no coincide con la estructura oficial',
                 value => {
                     if (!value) return false;
-
-
                     const birthDate = value.substring(4, 10);
-
-
                     const basicStructure = /^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/.test(value);
-
 
                     const year = parseInt(birthDate.substring(0, 2)),
                         month = parseInt(birthDate.substring(2, 4)) - 1,
@@ -69,30 +76,60 @@ export const UserModal = ({ visible, setVisible, onSuccess }) => {
             .matches(/^\d{10}$/, "El teléfono no es válido"),
         birthdate: Yup.string()
             .required("La fecha de nacimiento es obligatoria")
-
     });
 
-
-
-    // Configuración de Formik
     const formik = useFormik({
         initialValues: {
-            firstName: '',
-            lastName: '',
-            email: '',
+            firstName: isEditMode ? userToEdit.firstName : '',
+            lastName: isEditMode ? userToEdit.lastName : '',
+            surname: isEditMode ? userToEdit.surname : '',
+            rfc: isEditMode ? userToEdit.rfc : '',
+            email: isEditMode ? userToEdit.email : '',
             password: '',
-            status: true
+            phone: isEditMode ? userToEdit.phone : '',
+            birthdate: isEditMode && userToEdit.birthdate ? new Date(userToEdit.birthdate) : null,
         },
         validationSchema,
         onSubmit: async (values) => {
+            const data = {
+                ...values,
+                birthdate: values.birthdate
+                    ? moment(values.birthdate).format('YYYY-MM-DD')
+                    : null
+            };
+
+            if (isEditMode && !values.password) {
+                delete data.password;
+            }
+
             try {
-                console.log('Datos del formulario:', values);
-                if (onSuccess) {
-                    onSuccess(values);
+                let response;
+                if (isEditMode) {
+                    response = await ClientService.editAgente({
+                        id: userToEdit.id,
+                        ...data
+                    });
+                } else {
+                    response = await ClientService.saveAgente(data);
                 }
-                setVisible(false);
+
+                if (response.status === 'OK' || response.success) {
+                    setVisible(false);
+                    formik.resetForm();
+                    showSuccessAlert(response.message ||
+                        (isEditMode ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente'),
+                        () => {
+                            if (onSuccess) onSuccess();
+                        }
+                    );
+                } else {
+                    showErrorAlert(response.message ||
+                        (isEditMode ? 'Error al actualizar el usuario' : 'Error al crear el usuario')
+                    );
+                }
             } catch (error) {
-                console.error('Error al registrar el usuario:', error);
+                console.log("Error al procesar la solicitud:", error);
+                showErrorAlert('Ocurrió un error al procesar la solicitud');
             }
         }
     });
@@ -102,9 +139,24 @@ export const UserModal = ({ visible, setVisible, onSuccess }) => {
         formik.setFieldTouched(fieldName, true, false);
     };
 
+    React.useEffect(() => {
+        if (isEditMode && userToEdit) {
+            formik.setValues({
+                firstName: userToEdit.firstName,
+                lastName: userToEdit.lastName,
+                surname: userToEdit.surname,
+                rfc: userToEdit.rfc,
+                email: userToEdit.email,
+                password: '', 
+                phone: userToEdit.phone,
+                birthdate: userToEdit.birthdate ? new Date(userToEdit.birthdate) : null
+            });
+        }
+    }, [userToEdit, isEditMode]);
+
     return (
         <Dialog
-            header={"Crear usuario"}
+            header={isEditMode ? "Editar usuario" : "Crear usuario"}
             visible={visible}
             className='w-full md:w-[40vw]'
             onHide={() => {
@@ -116,22 +168,22 @@ export const UserModal = ({ visible, setVisible, onSuccess }) => {
                 <div className='mt-4'>
                     <FloatLabel className='w-full'>
                         <InputText
-                            id="name"
-                            name="name"
-                            className={`border ${formik.touched.name && formik.errors.name ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
-                            value={formik.values.name}
-                            onChange={(e) => handleChange('name', e.target.value)}
+                            id="firstName"
+                            name="firstName"
+                            className={`border ${formik.touched.firstName && formik.errors.firstName ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                            value={formik.values.firstName}
+                            onChange={(e) => handleChange('firstName', e.target.value)}
                         />
-                        <label htmlFor="name">Nombre</label>
+                        <label htmlFor="firstName">Nombre</label>
                     </FloatLabel>
-                    {formik.touched.name && formik.errors.name && (
-                        <div className="text-red-500 text-xs mt-1">{formik.errors.name}</div>
+                    {formik.touched.firstName && formik.errors.firstName && (
+                        <div className="text-red-500 text-xs mt-1">{formik.errors.firstName}</div>
                     )}
                 </div>
 
-                <div className={`${formik.touched.name && formik.errors.name ? 'mt-8' : 'mt-7'} w-full flex flex-col justify-between items-start md:flex-row`}>
+                <div className={`${formik.touched.firstName && formik.errors.firstName ? 'mt-8' : 'mt-7'} w-full flex flex-col justify-between items-start md:flex-row`}>
                     <div className='w-full md:w-[47%]'>
-                        <FloatLabel >
+                        <FloatLabel>
                             <InputText
                                 id="lastName"
                                 name="lastName"
@@ -146,7 +198,7 @@ export const UserModal = ({ visible, setVisible, onSuccess }) => {
                         )}
                     </div>
                     <div className='w-full md:w-[47%]'>
-                        <FloatLabel >
+                        <FloatLabel>
                             <InputText
                                 id="surname"
                                 name="surname"
@@ -194,26 +246,26 @@ export const UserModal = ({ visible, setVisible, onSuccess }) => {
                     )}
                 </div>
 
-                {/* Campo Password */}
-                <div className={`${formik.touched.user?.email && formik.errors.user?.email ? 'mt-8' : 'mt-7'}`}>
+                <div className={`${formik.touched.email && formik.errors.email ? 'mt-8' : 'mt-7'}`}>
                     <FloatLabel className='w-full'>
                         <InputText
                             id="password"
                             name="password"
                             type="password"
-                            className={`border ${formik.touched.user?.password && formik.errors.user?.password ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                            className={`border ${formik.touched.password && formik.errors.password ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
                             value={formik.values.password}
                             onChange={(e) => handleChange('password', e.target.value)}
+                            placeholder={isEditMode ? "" : ""}
+                            disabled={isEditMode}
                         />
                         <label htmlFor="password">Contraseña</label>
                     </FloatLabel>
-                    {formik.touched.user?.password && formik.errors.user?.password && (
+                    {formik.touched.password && formik.errors.password && (
                         <div className="text-red-500 text-xs mt-1">{formik.errors.password}</div>
                     )}
                 </div>
 
-                <div className={`${formik.touched.email && formik.errors.email ? 'mt-8' : 'mt-7'} flex flex-col justify-between items-start md:flex-row`}>
-
+                <div className={`${formik.touched.password && formik.errors.password ? 'mt-8' : 'mt-7'} flex flex-col justify-between items-start md:flex-row`}>
                     <div className='w-full md:w-[47%]'>
                         <FloatLabel className='w-full'>
                             <InputText
@@ -223,7 +275,7 @@ export const UserModal = ({ visible, setVisible, onSuccess }) => {
                                 value={formik.values.phone}
                                 onChange={(e) => handleChange('phone', e.target.value)}
                             />
-                            <label htmlFor="phone">Número de teléfono</label>
+                            <label htmlFor="phone">Teléfono</label>
                         </FloatLabel>
                         {formik.touched.phone && formik.errors.phone && (
                             <div className="text-red-500 text-xs mt-1">{formik.errors.phone}</div>
@@ -234,11 +286,10 @@ export const UserModal = ({ visible, setVisible, onSuccess }) => {
                             <Calendar
                                 id="birthdate"
                                 name="birthdate"
-                                value={formik.values.birthdate ? new Date(formik.values.birthdate) : null}
-                                onChange={(e) => handleChange('birthdate', e.target.value)}
-                                className={`border ${formik.touched.birthdate && formik.errors.birthdate ? 'border-red-500' : 'border-gray-300'}min-h-10 h-10 pl-4 w-full rounded-md`}
+                                value={formik.values.birthdate}
+                                onChange={(e) => handleChange('birthdate', e.value)}
+                                className={`border ${formik.touched.birthdate && formik.errors.birthdate ? 'border-red-500' : 'border-gray-300'} min-h-10 h-10 pl-4 w-full rounded-md`}
                                 dateFormat="yy/mm/dd"
-                            // showIcon
                             />
                             <label htmlFor="birthdate">Fecha de nacimiento</label>
                         </FloatLabel>
@@ -248,14 +299,15 @@ export const UserModal = ({ visible, setVisible, onSuccess }) => {
                     </div>
                 </div>
 
-
                 <div className='mt-8'>
                     <button
                         type="submit"
                         className='w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition duration-200'
                         disabled={formik.isSubmitting || !formik.isValid}
                     >
-                        {formik.isSubmitting ? 'Iniciando sesión...' : 'Login'}
+                        {formik.isSubmitting
+                            ? 'Procesando...'
+                            : isEditMode ? 'Actualizar usuario' : 'Registrar usuario'}
                     </button>
                 </div>
             </form>

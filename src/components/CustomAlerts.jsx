@@ -54,9 +54,8 @@ export const showConfirmAlert = (message, confirmCallback, cancelCallback = null
   });
 };
 
-// Componente de alertas (opcional, si necesitas un componente React)
 const CustomAlerts = () => {
-  return null; // Este componente no renderiza nada, solo exporta las funciones
+  return null; 
 };
 
 export default CustomAlerts;

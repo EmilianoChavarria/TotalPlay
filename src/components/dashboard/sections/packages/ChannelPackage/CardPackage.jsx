@@ -9,7 +9,6 @@ export const CardPackage = ({ channelPackage, onEdit, onDeleteSuccess }) => {
     const [visibleListModal, setVisibleListModal] = useState(false);
     const menuRef = React.useRef(null);
 
-    // Manejar eliminación del paquete
     const handleDelete = async () => {
         confirmDialog({
             message: '¿Estás seguro de que deseas eliminar este paquete?',
@@ -37,7 +36,6 @@ export const CardPackage = ({ channelPackage, onEdit, onDeleteSuccess }) => {
         });
     };
 
-    // Elementos del menú contextual
     const menuItems = [
         {
             label: 'Editar',
@@ -65,7 +63,7 @@ export const CardPackage = ({ channelPackage, onEdit, onDeleteSuccess }) => {
                         {channelPackage.name}
                     </span>
                     
-                    {/* Botón de menú contextual */}
+                    {/* Botón de menú */}
                     <button
                         className='p-2 rounded-lg text-gray-800 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500'
                         onClick={(e) => menuRef.current.toggle(e)}
@@ -76,7 +74,7 @@ export const CardPackage = ({ channelPackage, onEdit, onDeleteSuccess }) => {
                         <i className='pi pi-ellipsis-v' style={{ fontSize: '0.9rem' }} />
                     </button>
                     
-                    {/* Menú contextual */}
+                    {/* Menú  */}
                     <Menu 
                         model={menuItems} 
                         popup 

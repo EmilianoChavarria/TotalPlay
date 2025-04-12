@@ -8,8 +8,8 @@ import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../../
 
 export const SalesPackage = () => {
     const { hasRole } = useAuth();
-    const menuRef = useRef(null); // Referencia para el menú
-    const [selectedPackage, setSelectedPackage] = useState(null); // Paquete seleccionado para el menú
+    const menuRef = useRef(null); 
+    const [selectedPackage, setSelectedPackage] = useState(null); 
 
     const [visible, setVisible] = useState(false);
     const [visibleChannel, setVisibleChannel] = useState(false);
@@ -46,13 +46,11 @@ export const SalesPackage = () => {
                 }
             },
             () => {
-                // Callback para cuando el usuario cancela
                 console.log('Eliminación cancelada por el usuario');
             }
         );
     };
 
-    // Elementos del menú (ahora usa selectedPackage)
     const menuItems = [
         {
             label: 'Editar',
@@ -60,7 +58,6 @@ export const SalesPackage = () => {
             command: () => {
                 if (selectedPackage) {
                     console.log('Editar paquete:', selectedPackage.id);
-                    // Lógica para editar (puedes abrir un modal aquí)
                 }
             }
         },
@@ -70,7 +67,6 @@ export const SalesPackage = () => {
             command: () => {
                 if (selectedPackage) {
                     console.log('Eliminar paquete:', selectedPackage.id);
-                    // Lógica para eliminar (puedes llamar a deleteChannelpackage aquí)
                     deleteSalesPackage(selectedPackage.id);
                 }
             }
@@ -88,7 +84,6 @@ export const SalesPackage = () => {
     return (
         <>
             <div className='flex flex-col'>
-                {/* Encabezado */}
                 <div className='w-full flex flex-col md:flex-row items-center justify-between'>
                     <h2 className='text-2xl font-semibold whitespace-nowrap'>Gestión de paquetes de ventas</h2>
                     {hasRole('ADMIN') && (
@@ -118,8 +113,8 @@ export const SalesPackage = () => {
                                             className="pi pi-ellipsis-v p-2 rounded-lg text-gray-800 hover:bg-gray-100 cursor-pointer"
                                             style={{ fontSize: '0.9rem' }}
                                             onClick={(e) => {
-                                                setSelectedPackage(item); // Guarda el paquete seleccionado
-                                                menuRef.current.toggle(e); // Muestra el menú
+                                                setSelectedPackage(item); 
+                                                menuRef.current.toggle(e);
                                             }}
                                             aria-controls="popup_menu"
                                             aria-haspopup

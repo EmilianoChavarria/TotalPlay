@@ -1,5 +1,5 @@
 import { Dialog } from 'primereact/dialog';
-import React from 'react'
+import React, { useEffect } from 'react'
 import moment from 'moment';
 
 import { useFormik } from 'formik';
@@ -12,7 +12,9 @@ import { showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
 
 
 
-export const ClientModal = ({ visible, setVisible, onSuccess }) => {
+export const ClientModal = ({ visible, setVisible, onSuccess, clientToEdit }) => {
+    const isEditMode = !!clientToEdit;
+    console.log("clientToEdit", clientToEdit)
 
     const validationSchema = Yup.object().shape({
         name: Yup.string()
@@ -67,45 +69,55 @@ export const ClientModal = ({ visible, setVisible, onSuccess }) => {
     // Configuración de Formik
     const formik = useFormik({
         initialValues: {
-            name: '',
-            lastName: '',
-            surname: '',
-            rfc: '',
-            email: '',
-            phone: '',
-            birthdate: '',
+            name: isEditMode ? clientToEdit.name : '',
+            lastName: isEditMode ? clientToEdit.lastName : '',
+            surname: isEditMode ? clientToEdit.surname : '',
+            rfc: isEditMode ? clientToEdit.rfc : '',
+            email: isEditMode ? clientToEdit.email : '',
+            phone: isEditMode ? clientToEdit.phone : '',
+            birthdate: isEditMode && clientToEdit.birthdate ? new Date(clientToEdit.birthdate) : null,
         },
         validationSchema,
         onSubmit: async (values) => {
+            console.log('Valores del formulario ANTES de procesar:', values);
+
             const data = {
                 ...values,
                 birthdate: values.birthdate
                     ? moment(values.birthdate).format('YYYY-MM-DD')
                     : null
             };
-
-            console.log('Datos formateados:', data);
+            console.log("data", data)
 
             try {
-                const response = await ClientService.saveClient(data);
-                console.log("Respuesta del servidor:", response);
+                let response;
+                if (isEditMode) {
+                    response = await ClientService.updateClient(({
+                        id: clientToEdit.userId, 
+                        ...data 
+                        , status: true
+                    }));
+                } else {
+                    
+                    response = await ClientService.saveClient(data);
+                }
 
                 if (response.status === 'OK' || response.success) {
                     setVisible(false);
                     formik.resetForm();
-                    showSuccessAlert(response.message || 'Cliente creado exitosamente', () => {
-                        if (onSuccess) {
-                            onSuccess();
+                    showSuccessAlert(response.message ||
+                        (isEditMode ? 'Cliente actualizado exitosamente' : 'Cliente creado exitosamente'),
+                        () => {
+                            if (onSuccess) onSuccess();
                         }
-                    });
+                    );
                 } else {
-                    setVisible(false);
-                    showErrorAlert(response.message || 'Ocurrió un error al crear el cliente', () => {
-                        setVisible(true);
-                    });
+                    showErrorAlert(response.message ||
+                        (isEditMode ? 'Error al actualizar el cliente' : 'Error al crear el cliente')
+                    );
                 }
             } catch (error) {
-                console.log("Error al crear el cliente:", error);
+                console.error("Error:", error);
                 showErrorAlert('Ocurrió un error al procesar la solicitud');
             }
         }
@@ -117,15 +129,38 @@ export const ClientModal = ({ visible, setVisible, onSuccess }) => {
         formik.setFieldTouched(fieldName, true, false);
     };
 
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        console.log('Formulario enviado - valores:', formik.values);
+        await formik.submitForm();
+    };
+
+    useEffect(() => {
+        if (isEditMode && clientToEdit) {
+            formik.setValues({
+                name: clientToEdit.name,
+                lastName: clientToEdit.lastName,
+                surname: clientToEdit.surname,
+                rfc: clientToEdit.rfc,
+                email: clientToEdit.email,
+                phone: clientToEdit.phone,
+                birthdate: clientToEdit.birthdate ? new Date(clientToEdit.birthdate) : null
+            });
+        }
+    }, [clientToEdit, isEditMode]);
+
     return (
         <Dialog
-            header="Registrar cliente"
+            header={isEditMode ? "Editar cliente" : "Registrar cliente"}
             visible={visible}
             className="w-full md:w-[30vw] xl:w-[40vw] 2xl:w-[30vw]"
-            onHide={() => visible && setVisible(false)}
+            onHide={() => {
+                setVisible(false);
+                formik.resetForm();
+            }}
         >
 
-            <form onSubmit={formik.handleSubmit} className='mt-8'>
+            <form onSubmit={handleFormSubmit} className='mt-8'>
                 <div className='mt-4'>
                     <FloatLabel className='w-full'>
                         <InputText
@@ -229,8 +264,11 @@ export const ClientModal = ({ visible, setVisible, onSuccess }) => {
                             <Calendar
                                 id="birthdate"
                                 name="birthdate"
-                                value={formik.values.birthdate ? new Date(formik.values.birthdate) : null}
-                                onChange={(e) => handleChange('birthdate', e.target.value)}
+                                value={formik.values.birthdate}
+                                onChange={(e) => {
+                                    console.log('Fecha seleccionada:', e.value);
+                                    handleChange('birthdate', e.value);
+                                }}
                                 className={`border ${formik.touched.birthdate && formik.errors.birthdate ? 'border-red-500' : 'border-gray-300'}min-h-10 h-10 pl-4 w-full rounded-md`}
                                 dateFormat="yy/mm/dd"
                             // showIcon
@@ -248,9 +286,8 @@ export const ClientModal = ({ visible, setVisible, onSuccess }) => {
                     <button
                         type="submit"
                         className='w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition duration-200'
-                        disabled={formik.isSubmitting || !formik.isValid}
                     >
-                        {formik.isSubmitting ? 'Iniciando sesión...' : 'Login'}
+                        {formik.isSubmitting ? 'Procesando...' : isEditMode ? 'Actualizar' : 'Registrar'}
                     </button>
                 </div>
             </form>

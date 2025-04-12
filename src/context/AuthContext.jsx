@@ -5,7 +5,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true); // Estado de carga
+    const [loading, setLoading] = useState(true); 
 
     const decodeToken = (token) => {
         try {
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
                 setUser(userData);
             }
         }
-        setLoading(false); // Finaliza la carga
+        setLoading(false); 
     }, []);
 
     const login = (token) => {
@@ -48,9 +48,9 @@ export const AuthProvider = ({ children }) => {
         return user?.roles.includes(requiredRole);
     };
 
-    // Si está cargando, muestra un loader o null
+    
     if (loading) {
-        return null; // O un componente de carga <Spinner />
+        return null; 
     }
 
     return (

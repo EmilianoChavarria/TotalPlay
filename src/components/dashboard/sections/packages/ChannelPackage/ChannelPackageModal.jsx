@@ -39,12 +39,10 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
   // -----------------------------------------------------------------------------------------------
 
 
-  // Obtener canales disponibles (excluyendo los ya seleccionados)
   const fetchChannels = async () => {
     try {
       const response = await ChannelService.getAllChannels();
       if (response.data && Array.isArray(response.data)) {
-        // Si estamos editando, filtrar los canales que ya están en el paquete
         const availableChannels = packageToEdit
           ? response.data.filter(channel =>
             !packageToEdit.channels.some(c => c.id === channel.id)
@@ -81,17 +79,14 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
       fetchChannels();
       fetchCategories();
 
-      // Si estamos editando, cargar los canales seleccionados
       if (packageToEdit) {
         formik.setValues({
           name: packageToEdit.name,
           description: packageToEdit.description
         });
 
-        // Establecer canales seleccionados
         setSelectedChannels(packageToEdit.channels || []);
       } else {
-        // Limpiar para creación
         formik.resetForm();
         setSelectedChannels([]);
       }
@@ -99,19 +94,16 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
   }, [visible, packageToEdit]);
 
 
-  // Agrega el canal a la segunda lista
   const addChannel = (channel) => {
     setSelectedChannels([...selectedChannels, channel]);
     setChannels(channels.filter(c => c.id !== channel.id));
   };
 
-  // Remueve el canal de la segunda lista
   const removeChannel = (channel) => {
     setChannels([...channels, channel]);
     setSelectedChannels(selectedChannels.filter(c => c.id !== channel.id));
   };
 
-  // Esto es para el formulario
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -135,13 +127,11 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
         let response;
 
         if (packageToEdit) {
-          // Llamada para actualizar
           response = await ChannelPackageService.updateChannelPackage(
             packageToEdit.id,
             packageData
           );
         } else {
-          // Llamada para crear
           response = await ChannelPackageService.saveChannelPackage(packageData);
         }
 

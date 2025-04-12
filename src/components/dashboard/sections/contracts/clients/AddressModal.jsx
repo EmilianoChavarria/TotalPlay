@@ -52,11 +52,11 @@ export const AddressModal = ({ visibleD, setVisibleD, user, onSuccess }) => {
                 });
 
                 if (response.status === 'OK') {
-                    setVisibleD(false); // Solo cierra ESTE modal
+                    setVisibleD(false); 
                     formik.resetForm();
                     showSuccessAlert('Dirección creada', () => {
                         if (onSuccess) {
-                            onSuccess(); // Esto llama a handleAddressSaved
+                            onSuccess();
                         }
                     });
                 }
@@ -66,7 +66,6 @@ export const AddressModal = ({ visibleD, setVisibleD, user, onSuccess }) => {
         }
     });
 
-    // Handler para cambios en los inputs
     const handleChange = (fieldName, value) => {
         formik.setFieldValue(fieldName, value);
         formik.setFieldTouched(fieldName, true, false);

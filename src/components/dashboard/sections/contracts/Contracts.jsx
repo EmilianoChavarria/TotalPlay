@@ -15,8 +15,8 @@ export const Contracts = () => {
   const [visibleD, setVisibleD] = useState(false);
   const [visibleG, setVisibleG] = useState(false);
   const [visibleContract, setVisibleContract] = useState(false);
-  const [clientContracts, setClientContracts] = useState({}); // Almacenará contratos por cliente
-  const [loadingContracts, setLoadingContracts] = useState({}); // Estado de carga por cliente
+  const [clientContracts, setClientContracts] = useState({}); 
+  const [loadingContracts, setLoadingContracts] = useState({}); 
 
   const menuRef = React.useRef(null);
 
@@ -52,7 +52,8 @@ export const Contracts = () => {
       label: 'Editar',
       icon: 'pi pi-pencil',
       command: () => {
-        console.log('asd');
+        setSelectedClient(user);
+        setVisible(true);
       }
     },
     {
@@ -109,7 +110,6 @@ export const Contracts = () => {
 
           if (response.status === 'OK' || response.success) {
             showSuccessAlert(response.message || 'Contrato cancelado exitosamente', () => {
-              // Actualización segura del estado
               setClientContracts(prev => {
                 const updatedContracts = { ...prev };
                 if (updatedContracts[clientId]) {
@@ -149,7 +149,6 @@ export const Contracts = () => {
     if (expandedClient === clientId) {
       setExpandedClient(null);
     } else {
-      // Si no tenemos los contratos de este cliente, los cargamos
       if (!clientContracts[clientId]) {
         await fetchContractsForClient(clientId);
       }
@@ -299,7 +298,7 @@ export const Contracts = () => {
           </tbody>
         </table>
       </div>
-      <ClientModal visible={visible} setVisible={setVisible} onSuccess={handleClientSave} />
+      <ClientModal visible={visible} setVisible={setVisible} clientToEdit={selectedClient} onSuccess={handleClientSave} />
       <AddressModal visibleD={visibleD} setVisibleD={setVisibleD} user={selectedClient} onSuccess={handleClientSave} />
       <AddressManageModals visibleD={visibleG} setVisibleD={setVisibleG} user={user} />
       <ContractModal user={user} visible={visibleContract} setVisible={setVisibleContract} />

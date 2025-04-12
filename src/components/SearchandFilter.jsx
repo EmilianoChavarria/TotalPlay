@@ -3,6 +3,7 @@ import { IconField, InputIcon } from 'primereact/iconfield';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 
+// Creo que este no se usa pero no borrar por si acaso
 export const SearchAndFilter = ({
   // Props para el buscador
   searchValue,

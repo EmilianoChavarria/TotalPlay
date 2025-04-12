@@ -2,7 +2,7 @@ import React from 'react'
 import { useAuth } from '../../context/AuthContext';
 
 export const Navbar = ({ toggleCollapse }) => {
-  const { hasRole, logout } = useAuth(); // Obtenemos la función logout del contexto
+  const { hasRole, logout } = useAuth();
 
   const handleLogout = () => {
     logout(); 

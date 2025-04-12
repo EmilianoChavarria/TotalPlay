@@ -24,7 +24,6 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
         }
     }
 
-    // Esquema de validación con Yup
     const validationSchema = Yup.object().shape({
         name: Yup.string()
             .required("El nombre es obligatorio")

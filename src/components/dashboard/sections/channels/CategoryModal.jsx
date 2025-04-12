@@ -16,7 +16,6 @@ export const CategoryModal = ({ visibleD, setVisibleD }) => {
         name: Yup.string()
             .required("El nombre de la categoría es obligatorio")
             .matches(
-                // Regex de solo letras y números
                 /^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/,
                 "El nombre de la categoría no es válida"
             )
@@ -24,7 +23,6 @@ export const CategoryModal = ({ visibleD, setVisibleD }) => {
     });
 
     // Esto es para el formulario
-    // Configuración de Formik
     const formik = useFormik({
         initialValues: {
             name: '',

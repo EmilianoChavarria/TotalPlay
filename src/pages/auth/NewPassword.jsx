@@ -32,7 +32,6 @@ export const NewPassword = () => {
 
                 console.log('Contraseña cambiada con éxito:', response);
 
-                // Mostrar alerta de éxito
                 await Swal.fire({
                     icon: 'success',
                     title: 'Contraseña actualizada',
@@ -43,7 +42,6 @@ export const NewPassword = () => {
             } catch (error) {
                 console.error('Error al cambiar contraseña:', error.message);
 
-                // Mostrar alerta de error específica
                 await Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -53,7 +51,6 @@ export const NewPassword = () => {
                     confirmButtonText: 'Entendido'
                 });
 
-                // Opcional: Redirigir a login si es error 401
                 if (error.message.includes('401')) {
                     AuthService.logout();
                     navigate('/login');

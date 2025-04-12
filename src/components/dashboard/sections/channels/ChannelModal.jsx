@@ -63,7 +63,6 @@ const handleFormSubmit = async (values, channelToEdit, onSuccess, setVisible, fo
     }
 };
 
-// Extracted API response handler
 const handleApiResponse = (response, setVisible, formik, onSuccess) => {
     if (response.status === 'OK') {
         setVisible(false);
@@ -378,7 +377,6 @@ export const ChannelModal = ({ visible, setVisible, onSuccess, channelToEdit }) 
                         )}
                     </div>
 
-                    {/* Botón de envío */}
                     <div className="mt-6">
                         <button
                             type="submit"

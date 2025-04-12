@@ -47,12 +47,12 @@ export const Login = () => {
                 console.log('Respuesta del servidor:', response);
 
                 if (response.jwt) {
-                    login(response.jwt); // Guardas el token en contexto
+                    login(response.jwt); 
 
                     if (response.temporal === "true") {
-                        navigate('/new-password'); // Redirige si la contraseña es temporal
+                        navigate('/new-password'); 
                     } else {
-                        navigate('/dashboard/home'); // Redirige normalmente
+                        navigate('/dashboard/home'); 
                     }
                 }
             } catch (error) {

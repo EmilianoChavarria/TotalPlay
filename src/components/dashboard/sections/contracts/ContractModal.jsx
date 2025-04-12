@@ -52,8 +52,8 @@ export const ContractModal = ({ user, visible, setVisible }) => {
         const selectedPackage = packages.find(p => p.id === selectedPackageId);
 
         const contractData = {
-            address: selectedAddressId, // ID de la dirección
-            salesPackage: selectedPackage.name, // Nombre del paquete
+            address: selectedAddressId, 
+            salesPackage: selectedPackage.name, 
             userId: localStorage.getItem('id'),
             amount: 1
         };

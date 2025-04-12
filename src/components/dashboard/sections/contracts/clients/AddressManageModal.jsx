@@ -25,7 +25,6 @@ export const AddressManageModals = ({ visibleD, setVisibleD, user }) => {
     };
 
     const handleAddressSaved = () => {
-        console.log("handleAddressSaved ejecutado"); // Debug
         fetchAddresses();
     };
 
@@ -53,7 +52,7 @@ export const AddressManageModals = ({ visibleD, setVisibleD, user }) => {
 
     useEffect(() => {
         if (visibleD) {
-            console.log("Modal visible, fetching addresses..."); // Debug
+            
             fetchAddresses();
         }
     }, [visibleD]);

@@ -23,8 +23,8 @@ export const AddressCard = ({ address, isSelected, onClick }) => {
                         className={`pi pi-ellipsis-v rounded-lg text-gray-800 hover:bg-gray-100 hover:cursor-pointer`}
                         style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}
                         onClick={(e) => {
-                            e.stopPropagation(); // Evitar que active la selección
-                            // menuRef.current.toggle(e);
+                            e.stopPropagation();
+                            
                         }}
                         aria-controls="popup_menu"
                         aria-haspopup

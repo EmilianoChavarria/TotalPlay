@@ -95,15 +95,14 @@ export const Channels = () => {
         }
       },
       () => {
-        // Callback para cuando el usuario cancela
         console.log('Eliminación cancelada por el usuario');
       }
     );
   };
 
-  // Si el modal guardó un canal, recargar los canales
+  
   const handleChannelSaved = () => {
-    fetchChannels(); // Volver a cargar los canales
+    fetchChannels(); 
   };
 
   useEffect(() => {
