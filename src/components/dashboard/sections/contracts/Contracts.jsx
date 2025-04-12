@@ -268,7 +268,7 @@ export const Contracts = () => {
                   <td className="px-6 py-4">{client.rfc}</td>
                   <td className="px-6 py-4">{client.phone}</td>
                   <td className="px-6 py-4">{client.addresses.length}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap flex items-center justify-center gap-2">
                     <button
                       className="text-white rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onClick={(e) => {
@@ -282,7 +282,7 @@ export const Contracts = () => {
                           rfc: client.rfc,
                           phone: client.phone,
                         });
-                        menuRef.current.toggle(e)
+                        menuRef.current.toggle(e);
                       }}
                     >
                       <i
@@ -293,12 +293,13 @@ export const Contracts = () => {
                       />
                     </button>
 
-                    <Menu
-                      model={menuItems}
-                      popup
-                      ref={menuRef}
-                      id="popup_menu"
-                      className="text-sm"
+                    <i
+                      className={`pi pi-chevron-down ${expandedClient === client.id ? 'rotate-180' : 'rotate-0'}`}
+                      style={{ fontSize: '0.9rem' }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleClient(client.id);
+                      }}
                     />
                   </td>
                 </tr>

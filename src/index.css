@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.rotate-0 {
+    transform: rotate(0deg);
+    transition: transform 0.2s ease;
+  }
+  
+  .rotate-180 {
+    transform: rotate(180deg);
+    transition: transform 0.2s ease;
+  }
