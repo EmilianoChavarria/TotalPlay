@@ -157,6 +157,61 @@ export const Contracts = () => {
     }
   };
 
+  const renderClientContracts = (client) => {
+    if (loadingContracts[client.id]) {
+      return (
+        <div className="flex justify-center items-center py-4">
+          <i className="pi pi-spinner pi-spin mr-2"></i>
+          Cargando contratos...
+        </div>
+      );
+    }
+
+    if (!clientContracts[client.id]?.length) {
+      return (
+        <div className="text-center py-4 text-gray-500">
+          No se encontraron contratos para este cliente
+        </div>
+      );
+    }
+
+    return clientContracts[client.id].map((contract) => (
+      <div key={contract.id} className="border-l-4 border-blue-500 pl-4 py-3 shadow-sm">
+        <div className="flex justify-between items-start">
+          <div className="mt-2 text-sm text-gray-500">
+            <p className='text-xl font-bold'>{contract.salesPackageEntity.name}</p>
+            <p><span className="font-medium">Contratado el:</span> {contract.creationDate}</p>
+            <p><span className="font-medium">Dirección:</span> {contract.address.name}
+              <p>{contract.address.street}, #{contract.address.number}, {contract.address.city}, {contract.address.state}, C.P. {contract.address.zipCode}</p>
+            </p>
+          </div>
+          <div className='flex'>
+            <div className='flex flex-col gap-y-2'>
+              <span className={`px-2 py-1 text-xs w-fit font-semibold rounded-full ${contract.status === true
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+                }`}>
+                {contract.status === true ? "Activo" : "Inactivo"}
+              </span>
+              <span className='text-xl font-bold text-blue-500'>
+                ${contract.salesPackageEntity.totalAmount}/mes
+              </span>
+            </div>
+            <div className='flex gap-x-2 items-center justify-center ml-4'>
+              <Button
+                tooltip="Cancelar contrato"
+                tooltipOptions={{ position: 'bottom' }}
+                onClick={() => cancelContract(contract.id)}
+              >
+                <i className="pi pi-times-circle text-red-500" style={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    ));
+  };
+
   return (
     <>
       <div className='w-full flex flex-col md:flex-row items-center justify-between'>
@@ -234,53 +289,7 @@ export const Contracts = () => {
                   <tr>
                     <td colSpan="6" className="px-6 py-4">
                       <div className="space-y-4 pl-8">
-                        {loadingContracts[client.id] ? (
-                          <div className="flex justify-center items-center py-4">
-                            <i className="pi pi-spinner pi-spin mr-2"></i>
-                            Cargando contratos...
-                          </div>
-                        ) : clientContracts[client.id]?.length > 0 ? (
-                          clientContracts[client.id].map((contract) => (
-                            <div key={contract.id} className="border-l-4 border-blue-500 pl-4 py-3 shadow-sm">
-                              <div className="flex justify-between items-start">
-                                <div className="mt-2 text-sm text-gray-500">
-                                  <p className='text-xl font-bold'>{contract.salesPackageEntity.name}</p>
-                                  <p><span className="font-medium">Contratado el:</span> {contract.creationDate}</p>
-                                  <p><span className="font-medium">Dirección:</span> {contract.address.name}
-                                    <p>{contract.address.street}, #{contract.address.number}, {contract.address.city}, {contract.address.state}, C.P. {contract.address.zipCode}</p>
-                                  </p>
-                                  {/* <p><span className="font-medium">Address:</span> {contract.address}</p> */}
-                                </div>
-                                <div className='flex'>
-                                  <div className='flex flex-col gap-y-2'>
-                                    <span className={`px-2 py-1 text-xs w-fit font-semibold rounded-full ${contract.status === true
-                                      ? "bg-green-100 text-green-800"
-                                      : "bg-red-100 text-red-800"
-                                      }`}>
-                                      {contract.status === true ? "Activo" : "Inactivo"}
-                                    </span>
-                                    <span className='text-xl font-bold text-blue-500'>
-                                      ${contract.salesPackageEntity.totalAmount}/mes
-                                    </span>
-                                  </div>
-                                  <div className='flex gap-x-2 items-center justify-center ml-4'>
-                                    <Button tooltip="Cancelar contrato" tooltipOptions={{ position: 'bottom' }} onClick={() => {
-                                      cancelContract(contract.id);
-
-                                    }}>
-                                      <i className="pi pi-times-circle text-red-500" style={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-
-                            </div>
-                          ))
-                        ) : (
-                          <div className="text-center py-4 text-gray-500">
-                            No se encontraron contratos para este cliente
-                          </div>
-                        )}
+                        {renderClientContracts(client)}
                       </div>
                     </td>
                   </tr>

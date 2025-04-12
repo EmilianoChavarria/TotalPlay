@@ -1,43 +1,15 @@
 import { Dialog } from 'primereact/dialog';
-import React from 'react'
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react'
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { FloatLabel } from 'primereact/floatlabel';
 import { InputText } from 'primereact/inputtext';
 import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
-import { useEffect } from 'react';
 import { SalesPackageService } from '../../../../../services/SalesPackageService';
 import { showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
 
 export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
-    // Estado para los paquetes disponibles
-    const [availablePackages] = useState([
-        {
-            id: 1,
-            name: "Premium Package",
-            description: "150 Channels • 1000 Mbps",
-            price: "$99.99/month"
-        },
-        {
-            id: 2,
-            name: "Basic Package",
-            description: "50 Channels • 200 Mbps",
-            price: "$49.99/month"
-        },
-        {
-            id: 3,
-            name: "Sports Package",
-            description: "80 Channels • 500 Mbps",
-            price: "$69.99/month"
-        },
-        {
-            id: 4,
-            name: "Family Package",
-            description: "100 Channels • 300 Mbps",
-            price: "$79.99/month"
-        }
-    ]);
+
 
     const [channelPackages, setChannelPackages] = useState([]);
     const [selectedPackage, setSelectedPackage] = useState(null);
@@ -81,11 +53,11 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
                 channel_package_name: selectedPackage.name
             };
             console.log('Datos del formulario:', formData);
-            
+
             try {
                 const response = await SalesPackageService.saveChannel(formData);
                 console.log("Respuesta del servidor:", response);
-        
+
                 if (response.status === 'CREATED' || response.success) {
                     setVisible(false);
                     formik.resetForm();
@@ -123,7 +95,12 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
     }, [visible])
 
     return (
-        <Dialog header="Agregar paquete de ventas" visible={visible} className='w-full md:w-[30vw] xl:w-[40vw] 2xl:w-[30vw]' onHide={() => { if (!visible) return; setVisible(false); }}>
+        <Dialog
+            header="Agregar paquete de ventas"
+            visible={visible}
+            className="w-full md:w-[30vw] xl:w-[40vw] 2xl:w-[30vw]"
+            onHide={() => visible && setVisible(false)}
+        >
             <form onSubmit={formik.handleSubmit} className='mt-8'>
                 <div className='mt-4'>
                     <FloatLabel className='w-full'>
@@ -207,7 +184,7 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
                                     <p className='text-lg font-semibold'>{pkg.name}</p>
                                     <p className='text-sm text-gray-600'>Incluye {pkg.channels.length} canales</p>
                                 </div>
-                                
+
                             </div>
                         ))}
                     </div>

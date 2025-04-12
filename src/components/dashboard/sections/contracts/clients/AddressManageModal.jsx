@@ -29,6 +29,28 @@ export const AddressManageModals = ({ visibleD, setVisibleD, user }) => {
         fetchAddresses();
     };
 
+    const renderAddressContent = () => {
+        if (loading) {
+            return (
+                <div className="flex justify-center mt-4">
+                    <i className="pi pi-spinner pi-spin" style={{ fontSize: '2rem' }}></i>
+                </div>
+            );
+        }
+
+        if (addresses.length === 0) {
+            return <p className="text-gray-500 text-center py-4">No hay direcciones registradas</p>;
+        }
+
+        return (
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                {addresses.map((address) => (
+                    <AddressCard key={address.id} address={address} />
+                ))}
+            </div>
+        );
+    };
+
     useEffect(() => {
         if (visibleD) {
             console.log("Modal visible, fetching addresses..."); // Debug
@@ -48,19 +70,7 @@ export const AddressManageModals = ({ visibleD, setVisibleD, user }) => {
                 }}
             >
 
-                {loading ? (
-                    <div className="flex justify-center mt-4">
-                        <i className="pi pi-spinner pi-spin" style={{ fontSize: '2rem' }}></i>
-                    </div>
-                ) : addresses.length === 0 ? (
-                    <p className="text-gray-500 text-center py-4">No hay direcciones registradas</p>
-                ) : (
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-                        {addresses.map((address) => (
-                            <AddressCard key={address.id} address={address} />
-                        ))}
-                    </div>
-                )}
+                {renderAddressContent()}
             </Dialog>
 
             <AddressModal

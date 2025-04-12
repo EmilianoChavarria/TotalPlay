@@ -1,18 +1,115 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { FloatLabel } from 'primereact/floatlabel';
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { AutoComplete } from "primereact/autocomplete";
-
-// Esto es para el formulario
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-
 import { CategoryModal } from './CategoryModal';
 import { ChannelService } from '../../../../services/ChannelService';
 import { CategoryService } from '../../../../services/CategoryService';
 import Swal from 'sweetalert2';
+
+// Extracted validation schema
+const getValidationSchema = () => Yup.object().shape({
+    name: Yup.string()
+        .required("El nombre del canal es obligatorio")
+        .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ0-9]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ0-9]+)*$/, "El nombre del canal no es válido"),
+    description: Yup.string()
+        .required("La descripción del canal es obligatoria")
+        .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/, "La descripción del canal no es válida"),
+    number: Yup.number()
+        .typeError('El número del canal no es válido')
+        .required("El número del canal es obligatorio")
+        .min(1, "El número del canal no es válido"),
+    category: Yup.object()
+        .required("La categoría del canal es obligatoria")
+        .shape({
+            id: Yup.number().required(),
+            name: Yup.string().required(),
+            uuid: Yup.string().required(),
+            status: Yup.boolean().required()
+        }),
+    logo: Yup.string().required("El logo del canal es obligatorio")
+});
+
+// Extracted form submission handler
+const handleFormSubmit = async (values, channelToEdit, onSuccess, setVisible, formik) => {
+    const formData = new FormData();
+    formData.append('name', values.name);
+    formData.append('description', values.description);
+    formData.append('number', values.number.toString());
+    formData.append('categoryId', values.category.id.toString());
+
+    if (values.logo instanceof File) {
+        formData.append('image', values.logo);
+    } else if (channelToEdit && !(values.logo instanceof File)) {
+        formData.append('keepImage', 'true');
+    }
+
+    try {
+        let response;
+        if (channelToEdit) {
+            formData.append('id', channelToEdit.id.toString());
+            response = await ChannelService.updateChannel(channelToEdit.id, formData);
+        } else {
+            response = await ChannelService.saveChannel(formData);
+        }
+
+        handleApiResponse(response, setVisible, formik, onSuccess);
+    } catch (error) {
+        handleApiError(error);
+    }
+};
+
+// Extracted API response handler
+const handleApiResponse = (response, setVisible, formik, onSuccess) => {
+    if (response.status === 'OK') {
+        setVisible(false);
+        formik.resetForm();
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: response.message,
+        });
+        onSuccess?.();
+    } else {
+        setVisible(false);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error, inténtelo nuevamente',
+            text: response.message || 'Hubo un problema al guardar el canal',
+        }).then(() => setVisible(true));
+    }
+};
+
+// Extracted error handler
+const handleApiError = (error) => {
+    console.error("Error al crear/actualizar el canal:", error);
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un problema de conexión o del servidor',
+    });
+};
+
+// Extracted image validation
+const validateImage = (file, formik, event) => {
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!validTypes.includes(file.type)) {
+        formik.setFieldError('logo', 'Formato de imagen no válido');
+        return false;
+    }
+
+    if (file.size > 2000000) {
+        formik.setFieldError('logo', 'La imagen es demasiado grande');
+        event.target.value = '';
+        return false;
+    }
+
+    return true;
+};
 
 export const ChannelModal = ({ visible, setVisible, onSuccess, channelToEdit }) => {
     const [visibleD, setVisibleD] = useState(false);
@@ -21,46 +118,23 @@ export const ChannelModal = ({ visible, setVisible, onSuccess, channelToEdit }) 
     const [previewImage, setPreviewImage] = useState(null);
     const [loadingCategories, setLoadingCategories] = useState(false);
 
-    // Esquema de validación
-    const validationSchema = Yup.object().shape({
-        name: Yup.string()
-            .required("El nombre del canal es obligatorio")
-            .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ0-9]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ0-9]+)*$/, "El nombre del canal no es válido")
-        ,
-        description: Yup.string()
-            .required("La descripción del canal es obligatoria")
-            .matches(/^[a-zA-ZÁÉÍÓÚáéíóúñÑ]+(?: [a-zA-ZÁÉÍÓÚáéíóúñÑ]+)*$/, "La descripción del canal no es válida"),
-        number: Yup.number()
-            .typeError('El número del canal no es válido')
-            .required("El número del canal es obligatorio")
-            .min(1, "El número del canal no es válido"),
-        category: Yup.object()
-            .required("La categoría del canal es obligatoria")
-            .shape({
-                id: Yup.number().required(),
-                name: Yup.string().required(),
-                uuid: Yup.string().required(),
-                status: Yup.boolean().required()
-            }),
-        logo: Yup.string()
-            .required("El logo del canal es obligatorio")
-        // .test("is-valid-image", "La imagen no es válida", (value) => {
-        //     if (!value) return false;
-        //     return value.startsWith('data:image');
-        // })
+    const formik = useFormik({
+        initialValues: {
+            name: '',
+            description: '',
+            number: '',
+            category: null,
+            logo: null
+        },
+        validationSchema: getValidationSchema(),
+        onSubmit: (values) => handleFormSubmit(values, channelToEdit, onSuccess, setVisible, formik)
     });
 
-    // Obtener categorías del servicio
     const fetchCategories = async () => {
         setLoadingCategories(true);
         try {
             const response = await CategoryService.getCategories();
-            if (response.data && Array.isArray(response.data)) {
-                setCategories(response.data);
-            } else {
-                console.error("Formato de datos inesperado:", response);
-                setCategories([]);
-            }
+            setCategories(response.data && Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error("Error al obtener las categorías:", error);
             setCategories([]);
@@ -69,51 +143,42 @@ export const ChannelModal = ({ visible, setVisible, onSuccess, channelToEdit }) 
         }
     };
 
-    // Cargar categorías al montar el componente y cuando se abre el modal
     useEffect(() => {
         if (visible) {
             fetchCategories();
-
-            // Si hay un canal para editar, cargar sus datos
             if (channelToEdit) {
-                formik.setValues({
-                    name: channelToEdit.name,
-                    description: channelToEdit.description,
-                    number: channelToEdit.number,
-                    category: channelToEdit.category,
-                    logo: channelToEdit.logoBean?.image
-                        ? `data:image/jpeg;base64,${channelToEdit.logoBean.image}`
-                        : null
-                });
-
-                if (channelToEdit.logoBean?.image) {
-                    setPreviewImage(`data:image/jpeg;base64,${channelToEdit.logoBean.image}`);
-                }
+                loadChannelData(channelToEdit, formik, setPreviewImage);
             }
         } else {
-            // Limpiar el formulario cuando se cierra el modal
             formik.resetForm();
             setPreviewImage(null);
         }
     }, [visible, channelToEdit]);
 
-    // Actualizar categorías cuando se cierra el modal de categoría
-    const handleCategoryModalClose = () => {
-        setVisibleD(false);
-        fetchCategories(); // Refrescar las categorías después de agregar una nueva
+    const loadChannelData = (channel, formik, setPreviewImage) => {
+        formik.setValues({
+            name: channel.name,
+            description: channel.description,
+            number: channel.number,
+            category: channel.category,
+            logo: channel.logoBean?.image ? `data:image/jpeg;base64,${channel.logoBean.image}` : null
+        });
+        if (channel.logoBean?.image) {
+            setPreviewImage(`data:image/jpeg;base64,${channel.logoBean.image}`);
+        }
     };
 
-    // Búsqueda de categorías para el AutoComplete
+    const handleCategoryModalClose = () => {
+        setVisibleD(false);
+        fetchCategories();
+    };
+
     const searchCategory = (event) => {
         setTimeout(() => {
-            let filtered;
-            if (!event.query.trim().length) {
-                filtered = [...categories];
-            } else {
-                filtered = categories.filter((category) => {
-                    return category.name.toLowerCase().includes(event.query.toLowerCase());
-                });
-            }
+            const filtered = !event.query.trim().length
+                ? [...categories]
+                : categories.filter(category =>
+                    category.name.toLowerCase().includes(event.query.toLowerCase()));
             setFilteredCategories(filtered);
         }, 250);
     };
@@ -128,33 +193,17 @@ export const ChannelModal = ({ visible, setVisible, onSuccess, channelToEdit }) 
             return;
         }
 
-        // Verificar el tipo MIME del archivo
-        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!validateImage(file, formik, event)) return;
 
-        if (!validTypes.includes(file.type)) {
-            console.log("Tipo de archivo no válido:", file.type);
-            formik.setFieldError('logo', 'Formato de imagen no válido');
-            return;
-        }
-
-        // Verificar el tamaño del archivo
-        if (file.size > 2000000) { // 2MB
-            formik.setFieldError('logo', 'La imagen es demasiado grande');
-            event.target.value = '';
-            return;
-        }
-
-        // Verificar la cabecera del archivo para asegurar que es realmente una imagen
         const reader = new FileReader();
         reader.onloadend = () => {
             const arrayBuffer = reader.result;
             const uint8Array = new Uint8Array(arrayBuffer);
-
-            // Comprobar si la cabecera del archivo corresponde a una imagen JPG o PNG
             const header = uint8Array.slice(0, 4).join(',');
+
             if (!header.startsWith('255,216,255,224') && !header.startsWith('137,80,78,71')) {
                 formik.setFieldError('logo', 'El archivo no es una imagen válida');
-                event.target.value = ''; // Limpiar el archivo seleccionado
+                event.target.value = '';
                 return;
             }
 
@@ -164,105 +213,16 @@ export const ChannelModal = ({ visible, setVisible, onSuccess, channelToEdit }) 
         reader.readAsArrayBuffer(file);
     };
 
-
-
-    // Configuración de Formik
-    const formik = useFormik({
-        initialValues: {
-            name: '',
-            description: '',
-            number: '',
-            category: null,
-            logo: null
-        },
-        validationSchema,
-        onSubmit: async (values) => {
-            const formData = new FormData();
-
-            // Adjunta todos los campos como strings
-            formData.append('name', values.name);
-            formData.append('description', values.description);
-            formData.append('number', values.number.toString());
-            formData.append('categoryId', values.category.id.toString());
-
-            // Manejo de la imagen
-            if (values.logo instanceof File) {
-                formData.append('image', values.logo);
-            } else if (channelToEdit && !(values.logo instanceof File)) {
-                formData.append('keepImage', 'true');
-            }
-
-            // Depuración: Verifica el contenido del FormData
-            for (let [key, value] of formData.entries()) {
-                console.log(key, value);
-            }
-
-            try {
-                let response;
-
-                if (channelToEdit) {
-                    // Llamada para actualizar
-                    console.log(formData);
-                    formData.append('id', channelToEdit.id.toString());
-
-                    response = await ChannelService.updateChannel(channelToEdit.id, formData);
-                } else {
-                    // Llamada para crear
-                    response = await ChannelService.saveChannel(formData);
-                }
-
-                console.log("Respuesta del servidor:", response);
-
-                if (response.status === 'OK') {
-                    setVisible(false);
-                    formik.resetForm();
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Éxito',
-                        text: response.message,
-                    });
-
-                    if (onSuccess) {
-                        onSuccess();
-                    }
-                } else {
-                    setVisible(false);
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error, inténtelo nuevamente',
-                        text: response.message || 'Hubo un problema al guardar el canal',
-                    }).then(() => {
-                        setVisible(true);
-                    });
-                }
-            } catch (error) {
-                console.log("Error al crear/actualizar el canal:", error);
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Hubo un problema de conexión o del servidor',
-                });
-            }
-        }
-    });
-
-    // Handler para cambios en los inputs
     const handleChange = (fieldName, value) => {
         formik.setFieldValue(fieldName, value);
         formik.setFieldTouched(fieldName, true, false);
     };
 
-    // Función para mostrar el nombre de la categoría en el AutoComplete
-    const itemTemplate = (item) => {
-        return (
-            <div className="flex align-items-center">
-                <div>{item.name}</div>
-            </div>
-        );
-    };
+    const itemTemplate = (item) => (
+        <div className="flex align-items-center">
+            <div>{item.name}</div>
+        </div>
+    );
 
     return (
         <>

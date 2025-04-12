@@ -35,13 +35,7 @@ export const ClientModal = ({ visible, setVisible, onSuccess }) => {
                 'El RFC no coincide con la estructura oficial',
                 value => {
                     if (!value) return false;
-
-
-                    const firstFour = value.substring(0, 4);
                     const birthDate = value.substring(4, 10);
-                    const remaining = value.substring(10);
-
-
                     const basicStructure = /^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/.test(value);
 
 
@@ -95,7 +89,7 @@ export const ClientModal = ({ visible, setVisible, onSuccess }) => {
             try {
                 const response = await ClientService.saveClient(data);
                 console.log("Respuesta del servidor:", response);
-        
+
                 if (response.status === 'OK' || response.success) {
                     setVisible(false);
                     formik.resetForm();
@@ -124,7 +118,12 @@ export const ClientModal = ({ visible, setVisible, onSuccess }) => {
     };
 
     return (
-        <Dialog header="Registrar cliente" visible={visible} className='w-full md:w-[30vw] xl:w-[40vw] 2xl:w-[30vw]' onHide={() => { if (!visible) return; setVisible(false); }}>
+        <Dialog
+            header="Registrar cliente"
+            visible={visible}
+            className="w-full md:w-[30vw] xl:w-[40vw] 2xl:w-[30vw]"
+            onHide={() => visible && setVisible(false)}
+        >
 
             <form onSubmit={formik.handleSubmit} className='mt-8'>
                 <div className='mt-4'>
@@ -210,40 +209,40 @@ export const ClientModal = ({ visible, setVisible, onSuccess }) => {
 
                 <div className={`${formik.touched.email && formik.errors.email ? 'mt-8' : 'mt-7'} flex flex-col justify-between items-start md:flex-row`}>
 
-                <div className='w-full md:w-[47%]'>
-                    <FloatLabel className='w-full'>
-                        <InputText
-                            id="phone"
-                            name="phone"
-                            className={`border ${formik.touched.phone && formik.errors.phone ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
-                            value={formik.values.phone}
-                            onChange={(e) => handleChange('phone', e.target.value)}
-                        />
-                        <label htmlFor="phone">Número de teléfono</label>
-                    </FloatLabel>
-                    {formik.touched.phone && formik.errors.phone && (
-                        <div className="text-red-500 text-xs mt-1">{formik.errors.phone}</div>
-                    )}
+                    <div className='w-full md:w-[47%]'>
+                        <FloatLabel className='w-full'>
+                            <InputText
+                                id="phone"
+                                name="phone"
+                                className={`border ${formik.touched.phone && formik.errors.phone ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                                value={formik.values.phone}
+                                onChange={(e) => handleChange('phone', e.target.value)}
+                            />
+                            <label htmlFor="phone">Número de teléfono</label>
+                        </FloatLabel>
+                        {formik.touched.phone && formik.errors.phone && (
+                            <div className="text-red-500 text-xs mt-1">{formik.errors.phone}</div>
+                        )}
+                    </div>
+                    <div className='w-full md:w-[47%]'>
+                        <FloatLabel className='w-full rounded-md'>
+                            <Calendar
+                                id="birthdate"
+                                name="birthdate"
+                                value={formik.values.birthdate ? new Date(formik.values.birthdate) : null}
+                                onChange={(e) => handleChange('birthdate', e.target.value)}
+                                className={`border ${formik.touched.birthdate && formik.errors.birthdate ? 'border-red-500' : 'border-gray-300'}min-h-10 h-10 pl-4 w-full rounded-md`}
+                                dateFormat="yy/mm/dd"
+                            // showIcon
+                            />
+                            <label htmlFor="birthdate">Fecha de nacimiento</label>
+                        </FloatLabel>
+                        {formik.touched.birthdate && formik.errors.birthdate && (
+                            <div className="text-red-500 text-xs mt-1">{formik.errors.birthdate}</div>
+                        )}
+                    </div>
                 </div>
-                <div className='w-full md:w-[47%]'>
-                    <FloatLabel className='w-full rounded-md'>
-                        <Calendar
-                            id="birthdate"
-                            name="birthdate"
-                            value={formik.values.birthdate ? new Date(formik.values.birthdate) : null}
-                            onChange={(e) => handleChange('birthdate', e.target.value)}
-                            className={`border ${formik.touched.birthdate && formik.errors.birthdate ? 'border-red-500' : 'border-gray-300'}min-h-10 h-10 pl-4 w-full rounded-md`}
-                            dateFormat="yy/mm/dd"
-                        // showIcon
-                        />
-                        <label htmlFor="birthdate">Fecha de nacimiento</label>
-                    </FloatLabel>
-                    {formik.touched.birthdate && formik.errors.birthdate && (
-                        <div className="text-red-500 text-xs mt-1">{formik.errors.birthdate}</div>
-                    )}
-                </div>
-                </div>
-                
+
 
                 <div className='mt-8'>
                     <button

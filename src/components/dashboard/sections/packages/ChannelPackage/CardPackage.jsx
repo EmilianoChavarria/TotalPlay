@@ -1,9 +1,8 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { ChannelListModal } from './ChannelListModal';
 import { Menu } from 'primereact/menu';
 import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
-import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
+import { showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 
 export const CardPackage = ({ channelPackage, onEdit, onDeleteSuccess }) => {

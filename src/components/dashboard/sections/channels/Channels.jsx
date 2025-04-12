@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from 'primereact/dropdown';
 import { ChannelModal } from './ChannelModal';
 import { ChannelService } from '../../../../services/ChannelService';
-import { useEffect } from 'react';
 import { CategoryService } from '../../../../services/CategoryService';
 import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../CustomAlerts';
 
@@ -16,7 +15,7 @@ export const Channels = () => {
 
 
   const [channels, setChannels] = useState([]);
-  const [loadingChannels, setLoadingChannels] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState('');
 
   const [selectedCity, setSelectedCity] = useState(null);
@@ -24,7 +23,7 @@ export const Channels = () => {
   const [categories, setCategories] = useState([]);
 
   const fetchCategories = async () => {
-    setLoadingChannels(true);
+
     try {
       const response = await CategoryService.getCategories();
       if (response.data && Array.isArray(response.data)) {
@@ -36,8 +35,6 @@ export const Channels = () => {
     } catch (error) {
       console.error("Error al obtener las categorías:", error);
       setCategories([{ name: 'Todas' }]);
-    } finally {
-      setLoadingChannels(false);
     }
   };
 
@@ -55,7 +52,7 @@ export const Channels = () => {
 
 
   const fetchChannels = async () => {
-    setLoadingChannels(true);
+
     try {
       const response = await ChannelService.getAllChannels();
       console.log(response)
@@ -68,8 +65,6 @@ export const Channels = () => {
     } catch (error) {
       console.error("Error al obtener las categorías:", error);
       setChannels([]);
-    } finally {
-      setLoadingChannels(false);
     }
   };
 
@@ -83,7 +78,7 @@ export const Channels = () => {
     showConfirmAlert(
       '¿Estás seguro de que deseas eliminar este canal?',
       async () => {
-        setLoadingChannels(true);
+
         try {
           const response = await ChannelService.deleteChannel(id);
           console.log(response)
@@ -97,8 +92,6 @@ export const Channels = () => {
         } catch (error) {
           console.error("Error al eliminar el canal:", error);
           showErrorAlert('Ocurrió un error de conexión con el servidor');
-        } finally {
-          setLoadingChannels(false);
         }
       },
       () => {

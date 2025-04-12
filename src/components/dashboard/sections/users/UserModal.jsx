@@ -47,9 +47,7 @@ export const UserModal = ({ visible, setVisible, onSuccess }) => {
                     if (!value) return false;
 
 
-                    const firstFour = value.substring(0, 4);
                     const birthDate = value.substring(4, 10);
-                    const remaining = value.substring(10);
 
 
                     const basicStructure = /^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/.test(value);

@@ -73,7 +73,17 @@ export const AddressModal = ({ visibleD, setVisibleD, user, onSuccess }) => {
     };
 
     return (
-        <Dialog header={`Registrar dirección para el cliente: ${user?.name} ${user?.lastName}`} visible={visibleD} className='w-full md:w-[30vw] xl:w-[40vw] 2xl:w-[30vw]' onHide={() => { if (!visibleD) return; setVisibleD(false); }}>
+        <Dialog
+            header={`Registrar dirección para el cliente: ${user?.name} ${user?.lastName}`}
+            visible={visibleD}
+            className='w-full md:w-[30vw] xl:w-[40vw] 2xl:w-[30vw]'
+            onHide={() => {
+                if (!visibleD) {
+                    return;
+                }
+                setVisibleD(false);
+            }}
+        >
             <form onSubmit={formik.handleSubmit} className='mt-8'>
                 <div className={`mt-4 w-full flex flex-col justify-between items-start md:flex-row`}>
                     <div className='w-full md:w-[49%]'>

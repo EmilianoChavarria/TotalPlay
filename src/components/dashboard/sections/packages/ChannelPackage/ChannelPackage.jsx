@@ -1,9 +1,7 @@
-import React from 'react'
+import React,{ useState, useEffect } from 'react'
 import { CardPackage } from './CardPackage'
 import { ChannelPackageModal } from './ChannelPackageModal'
-import { useState } from 'react';
 import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
-import { useEffect } from 'react';
 
 export const ChannelPackage = () => {
   const [visible, setVisible] = useState(false);

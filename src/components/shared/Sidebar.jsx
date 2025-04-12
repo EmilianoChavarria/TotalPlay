@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 export const Sidebar = ({ items, collapsed, toggleCollapse, closeSidebarMobile }) => {
     const location = useLocation();
 
-    const { hasRole, logout } = useAuth();
+    const { logout } = useAuth();
 
     const handleLogout = () => {
         logout();

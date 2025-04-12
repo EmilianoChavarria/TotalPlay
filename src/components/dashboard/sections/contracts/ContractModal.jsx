@@ -7,7 +7,6 @@ import { Stepper } from 'primereact/stepper';
 import { StepperPanel } from 'primereact/stepperpanel';
 import { AddressCard } from './clients/AddressCard';
 import { classNames } from 'primereact/utils';
-import { useAuth } from '../../../../context/AuthContext';
 import { ContractService } from '../../../../services/ContractService';
 import { showErrorAlert, showSuccessAlert } from '../../../CustomAlerts';
 
@@ -18,7 +17,6 @@ export const ContractModal = ({ user, visible, setVisible }) => {
     const [loading, setLoading] = useState(false);
     const [selectedAddressId, setSelectedAddressId] = useState(null);
     const [selectedPackageId, setSelectedPackageId] = useState(null);
-    const { hasRole } = useAuth();
 
     const fetchAddresses = async () => {
         setLoading(true);
@@ -64,7 +62,7 @@ export const ContractModal = ({ user, visible, setVisible }) => {
         try {
             const response = await ContractService.saveContract(contractData);
             console.log("Respuesta del servidor:", response);
-    
+
             if (response.status === 'CREATED' || response.success) {
                 setVisible(false);
                 showSuccessAlert(response.message || 'Cliente creado exitosamente', () => {
@@ -99,6 +97,86 @@ export const ContractModal = ({ user, visible, setVisible }) => {
         setSelectedPackageId(null);
     };
 
+    const renderAddresses = () => {
+        if (loading) {
+            return (
+                <div className="flex justify-center py-4">
+                    <i className="pi pi-spinner pi-spin text-2xl"></i>
+                </div>
+            );
+        }
+
+        if (addresses.length === 0) {
+            return (
+                <div className="text-center py-4 text-gray-500">
+                    No hay direcciones registradas
+                </div>
+            );
+        }
+
+        return addresses.map((address) => (
+            <AddressCard
+                key={address.id}
+                address={address}
+                isSelected={selectedAddressId === address.id}
+                onClick={() => setSelectedAddressId(address.id)}
+            />
+        ));
+    };
+
+    const renderPackages = () => {
+        if (loading) {
+            return (
+                <div className="flex justify-center col-span-3 py-4">
+                    <i className="pi pi-spinner pi-spin text-2xl"></i>
+                </div>
+            );
+        }
+
+        if (packages.length === 0) {
+            return (
+                <div className="text-center col-span-3 py-4 text-gray-500">
+                    No hay paquetes disponibles
+                </div>
+            );
+        }
+
+        return packages.map((packageItem) => (
+            <div
+                key={packageItem.id}
+                className={classNames(
+                    'flex flex-col p-4 border rounded-md shadow-sm cursor-pointer transition-all duration-200 h-full',
+                    {
+                        'border-blue-500 bg-blue-50 ring-2 ring-blue-200': selectedPackageId === packageItem.id,
+                        'border-gray-200 hover:border-gray-300': selectedPackageId !== packageItem.id
+                    }
+                )}
+                onClick={() => setSelectedPackageId(packageItem.id)}
+            >
+                <h5 className='font-semibold text-lg mb-2'>{packageItem.name}</h5>
+                <p className='text-xl font-bold text-blue-600 mb-3'>${packageItem.totalAmount}/mes</p>
+                <div className='flex flex-col gap-y-2 mt-auto'>
+                    <p className='text-sm flex items-center'>
+                        <i className="pi pi-check-circle text-green-500 mr-2"></i>
+                        {packageItem.channelPackage.channels.length} canales incluidos
+                    </p>
+                    <p className='text-sm flex items-center'>
+                        <i className="pi pi-check-circle text-green-500 mr-2"></i>
+                        Velocidad: {packageItem.speed} Mbps
+                    </p>
+                    <p className='text-sm flex items-center'>
+                        <i className="pi pi-check-circle text-green-500 mr-2"></i>
+                        Instalación gratuita
+                    </p>
+                    <p className='text-sm flex items-center'>
+                        <i className="pi pi-check-circle text-green-500 mr-2"></i>
+                        Soporte técnico 24/7
+                    </p>
+                </div>
+            </div>
+        ));
+    };
+
     const selectedAddress = addresses.find(a => a.id === selectedAddressId);
     const selectedPackage = packages.find(p => p.id === selectedPackageId);
 
@@ -110,30 +188,13 @@ export const ContractModal = ({ user, visible, setVisible }) => {
             onHide={handleModalHide}
             modal
             dismissableMask
-            
+
         >
             <Stepper ref={stepperRef} className="custom-stepper">
                 <StepperPanel header="Dirección de servicio">
                     <div className="flex flex-col gap-3 mb-4">
                         <h4 className="font-bold mb-3">Selecciona la dirección de servicio</h4>
-                        {loading ? (
-                            <div className="flex justify-center py-4">
-                                <i className="pi pi-spinner pi-spin text-2xl"></i>
-                            </div>
-                        ) : addresses.length === 0 ? (
-                            <div className="text-center py-4 text-gray-500">
-                                No hay direcciones registradas
-                            </div>
-                        ) : (
-                            addresses.map((address) => (
-                                <AddressCard
-                                    key={address.id}
-                                    address={address}
-                                    isSelected={selectedAddressId === address.id}
-                                    onClick={() => setSelectedAddressId(address.id)}
-                                />
-                            ))
-                        )}
+                        {renderAddresses()}
                     </div>
 
                     <div className="flex justify-between pt-4 border-t">
@@ -157,50 +218,7 @@ export const ContractModal = ({ user, visible, setVisible }) => {
                     <div className="flex flex-col gap-4 mb-4">
                         <h4 className="font-bold mb-3">Selecciona un paquete de ventas</h4>
                         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-                            {loading ? (
-                                <div className="flex justify-center col-span-3 py-4">
-                                    <i className="pi pi-spinner pi-spin text-2xl"></i>
-                                </div>
-                            ) : packages.length === 0 ? (
-                                <div className="text-center col-span-3 py-4 text-gray-500">
-                                    No hay paquetes disponibles
-                                </div>
-                            ) : (
-                                packages.map((packageItem) => (
-                                    <div
-                                        key={packageItem.id}
-                                        className={classNames(
-                                            'flex flex-col p-4 border rounded-md shadow-sm cursor-pointer transition-all duration-200 h-full',
-                                            {
-                                                'border-blue-500 bg-blue-50 ring-2 ring-blue-200': selectedPackageId === packageItem.id,
-                                                'border-gray-200 hover:border-gray-300': selectedPackageId !== packageItem.id
-                                            }
-                                        )}
-                                        onClick={() => setSelectedPackageId(packageItem.id)}
-                                    >
-                                        <h5 className='font-semibold text-lg mb-2'>{packageItem.name}</h5>
-                                        <p className='text-xl font-bold text-blue-600 mb-3'>${packageItem.totalAmount}/mes</p>
-                                        <div className='flex flex-col gap-y-2 mt-auto'>
-                                            <p className='text-sm flex items-center'>
-                                                <i className="pi pi-check-circle text-green-500 mr-2"></i>
-                                                {packageItem.channelPackage.channels.length} canales incluidos
-                                            </p>
-                                            <p className='text-sm flex items-center'>
-                                                <i className="pi pi-check-circle text-green-500 mr-2"></i>
-                                                Velocidad: {packageItem.speed} Mbps
-                                            </p>
-                                            <p className='text-sm flex items-center'>
-                                                <i className="pi pi-check-circle text-green-500 mr-2"></i>
-                                                Instalación gratuita
-                                            </p>
-                                            <p className='text-sm flex items-center'>
-                                                <i className="pi pi-check-circle text-green-500 mr-2"></i>
-                                                Soporte técnico 24/7
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
+                            {renderPackages()}
                         </div>
                     </div>
 

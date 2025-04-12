@@ -1,4 +1,3 @@
-import { data } from "autoprefixer";
 import { BASE_URL, token } from "../config/const";
 
 export const ContractService = {

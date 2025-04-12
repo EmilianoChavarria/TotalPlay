@@ -1,6 +1,5 @@
 import { Dialog } from 'primereact/dialog';
-import React from 'react'
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react'
 
 // Esto es para el formulario
 import { useFormik } from 'formik';
@@ -11,8 +10,6 @@ import { InputTextarea } from 'primereact/inputtextarea';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { ChannelService } from '../../../../../services/ChannelService';
-import { use } from 'react';
-import { useEffect } from 'react';
 import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
 import { showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
 import { Dropdown } from 'primereact/dropdown';
@@ -173,7 +170,12 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
   };
 
   return (
-    <Dialog header={packageToEdit ? "Editar paquete de canales" : "Agregar paquete de canales"}  visible={visible} className='w-full  md:w-[60vw] xl:w-[60vw] 2xl:w-[40vw]' onHide={() => { if (!visible) return; setVisible(false); }}>
+    <Dialog
+      header={packageToEdit ? "Editar paquete de canales" : "Agregar paquete de canales"}
+      visible={visible}
+      className="w-full md:w-[60vw] xl:w-[60vw] 2xl:w-[40vw]"
+      onHide={() => visible && setVisible(false)}
+    >
       <form onSubmit={formik.handleSubmit} className='mt-10'>
         {/* Campo de nombre */}
         <div className='w-full'>

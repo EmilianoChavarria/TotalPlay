@@ -1,6 +1,4 @@
-import React from 'react';
-import { CardPackage } from '../ChannelPackage/CardPackage';
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SalesPackageModal } from './SalesPackageModal';
 import { SalesPackageService } from '../../../../../services/SalesPackageService';
 import { ChannelListModal } from '../ChannelPackage/ChannelListModal';
