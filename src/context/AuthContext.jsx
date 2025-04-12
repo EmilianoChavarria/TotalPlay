@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true); 
+    const [loading, setLoading] = useState(true);
 
     const decodeToken = (token) => {
         try {
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
                 setUser(userData);
             }
         }
-        setLoading(false); 
+        setLoading(false);
     }, []);
 
     const login = (token) => {
@@ -48,13 +48,20 @@ export const AuthProvider = ({ children }) => {
         return user?.roles.includes(requiredRole);
     };
 
-    
+    // Memoize the context value to prevent unnecessary re-renders
+    const contextValue = useMemo(() => ({
+        user,
+        login,
+        logout,
+        hasRole
+    }), [user]); // Only recreate when user changes
+
     if (loading) {
-        return null; 
+        return null;
     }
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, hasRole }}>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     );

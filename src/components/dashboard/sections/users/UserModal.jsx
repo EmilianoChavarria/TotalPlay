@@ -9,6 +9,32 @@ import { showErrorAlert, showSuccessAlert } from '../../../CustomAlerts';
 import { ClientService } from '../../../../services/ClientService';
 import moment from 'moment';
 
+// Función helper para manejar las clases de los campos
+const getFieldClasses = (fieldName, formik, fieldType = 'input') => {
+    const baseClasses = {
+        input: 'min-h-10 pl-4 w-full border',
+        calendar: 'min-h-10 h-10 pl-4 w-full rounded-md border'
+    };
+
+    const errorClasses = formik.touched[fieldName] && formik.errors[fieldName]
+        ? 'border-red-500'
+        : 'border-gray-300';
+
+    return `${baseClasses[fieldType]} ${errorClasses}`;
+};
+
+// Función para inicializar valores del formulario
+const getInitialValues = (isEditMode, userToEdit) => ({
+    firstName: isEditMode ? userToEdit.firstName : '',
+    lastName: isEditMode ? userToEdit.lastName : '',
+    surname: isEditMode ? userToEdit.surname : '',
+    rfc: isEditMode ? userToEdit.rfc : '',
+    email: isEditMode ? userToEdit.email : '',
+    password: '',
+    phone: isEditMode ? userToEdit.phone : '',
+    birthdate: isEditMode && userToEdit.birthdate ? new Date(userToEdit.birthdate) : null,
+});
+
 export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
     const isEditMode = !!userToEdit;
 
@@ -79,58 +105,11 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
     });
 
     const formik = useFormik({
-        initialValues: {
-            firstName: isEditMode ? userToEdit.firstName : '',
-            lastName: isEditMode ? userToEdit.lastName : '',
-            surname: isEditMode ? userToEdit.surname : '',
-            rfc: isEditMode ? userToEdit.rfc : '',
-            email: isEditMode ? userToEdit.email : '',
-            password: '',
-            phone: isEditMode ? userToEdit.phone : '',
-            birthdate: isEditMode && userToEdit.birthdate ? new Date(userToEdit.birthdate) : null,
-        },
+        initialValues: getInitialValues(isEditMode, userToEdit),
         validationSchema,
         onSubmit: async (values) => {
-            const data = {
-                ...values,
-                birthdate: values.birthdate
-                    ? moment(values.birthdate).format('YYYY-MM-DD')
-                    : null
-            };
-
-            if (isEditMode && !values.password) {
-                delete data.password;
-            }
-
-            try {
-                let response;
-                if (isEditMode) {
-                    response = await ClientService.editAgente({
-                        id: userToEdit.id,
-                        ...data
-                    });
-                } else {
-                    response = await ClientService.saveAgente(data);
-                }
-
-                if (response.status === 'OK' || response.success) {
-                    setVisible(false);
-                    formik.resetForm();
-                    showSuccessAlert(response.message ||
-                        (isEditMode ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente'),
-                        () => {
-                            if (onSuccess) onSuccess();
-                        }
-                    );
-                } else {
-                    showErrorAlert(response.message ||
-                        (isEditMode ? 'Error al actualizar el usuario' : 'Error al crear el usuario')
-                    );
-                }
-            } catch (error) {
-                console.log("Error al procesar la solicitud:", error);
-                showErrorAlert('Ocurrió un error al procesar la solicitud');
-            }
+            const data = prepareFormData(values, isEditMode);
+            await handleFormSubmission(data, isEditMode, userToEdit, setVisible, formik, onSuccess);
         }
     });
 
@@ -141,18 +120,16 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
 
     React.useEffect(() => {
         if (isEditMode && userToEdit) {
-            formik.setValues({
-                firstName: userToEdit.firstName,
-                lastName: userToEdit.lastName,
-                surname: userToEdit.surname,
-                rfc: userToEdit.rfc,
-                email: userToEdit.email,
-                password: '', 
-                phone: userToEdit.phone,
-                birthdate: userToEdit.birthdate ? new Date(userToEdit.birthdate) : null
-            });
+            formik.setValues(getInitialValues(isEditMode, userToEdit));
         }
     }, [userToEdit, isEditMode]);
+
+    const getButtonText = () => {
+        if (formik.isSubmitting) {
+            return 'Procesando...';
+        }
+        return isEditMode ? 'Actualizar usuario' : 'Registrar usuario';
+    };
 
     return (
         <Dialog
@@ -170,7 +147,7 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
                         <InputText
                             id="firstName"
                             name="firstName"
-                            className={`border ${formik.touched.firstName && formik.errors.firstName ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                            className={getFieldClasses('firstName', formik)}
                             value={formik.values.firstName}
                             onChange={(e) => handleChange('firstName', e.target.value)}
                         />
@@ -187,7 +164,7 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
                             <InputText
                                 id="lastName"
                                 name="lastName"
-                                className={`border ${formik.touched.lastName && formik.errors.lastName ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                                className={getFieldClasses('lastName', formik)}
                                 value={formik.values.lastName}
                                 onChange={(e) => handleChange('lastName', e.target.value)}
                             />
@@ -202,7 +179,7 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
                             <InputText
                                 id="surname"
                                 name="surname"
-                                className={`border ${formik.touched.surname && formik.errors.surname ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                                className={getFieldClasses('surname', formik)}
                                 value={formik.values.surname}
                                 onChange={(e) => handleChange('surname', e.target.value)}
                             />
@@ -219,7 +196,7 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
                         <InputText
                             id="rfc"
                             name="rfc"
-                            className={`border ${formik.touched.rfc && formik.errors.rfc ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                            className={getFieldClasses('rfc', formik)}
                             value={formik.values.rfc}
                             onChange={(e) => handleChange('rfc', e.target.value)}
                         />
@@ -235,7 +212,7 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
                         <InputText
                             id="email"
                             name="email"
-                            className={`border ${formik.touched.email && formik.errors.email ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                            className={getFieldClasses('email', formik)}
                             value={formik.values.email}
                             onChange={(e) => handleChange('email', e.target.value)}
                         />
@@ -252,10 +229,9 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
                             id="password"
                             name="password"
                             type="password"
-                            className={`border ${formik.touched.password && formik.errors.password ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                            className={getFieldClasses('password', formik)}
                             value={formik.values.password}
                             onChange={(e) => handleChange('password', e.target.value)}
-                            placeholder={isEditMode ? "" : ""}
                             disabled={isEditMode}
                         />
                         <label htmlFor="password">Contraseña</label>
@@ -271,7 +247,7 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
                             <InputText
                                 id="phone"
                                 name="phone"
-                                className={`border ${formik.touched.phone && formik.errors.phone ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                                className={getFieldClasses('phone', formik)}
                                 value={formik.values.phone}
                                 onChange={(e) => handleChange('phone', e.target.value)}
                             />
@@ -282,13 +258,13 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
                         )}
                     </div>
                     <div className='w-full md:w-[47%]'>
-                        <FloatLabel className='w-full rounded-md'>
+                        <FloatLabel className='w-full'>
                             <Calendar
                                 id="birthdate"
                                 name="birthdate"
                                 value={formik.values.birthdate}
                                 onChange={(e) => handleChange('birthdate', e.value)}
-                                className={`border ${formik.touched.birthdate && formik.errors.birthdate ? 'border-red-500' : 'border-gray-300'} min-h-10 h-10 pl-4 w-full rounded-md`}
+                                className={getFieldClasses('birthdate', formik, 'calendar')}
                                 dateFormat="yy/mm/dd"
                             />
                             <label htmlFor="birthdate">Fecha de nacimiento</label>
@@ -305,12 +281,62 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
                         className='w-full bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg transition duration-200'
                         disabled={formik.isSubmitting || !formik.isValid}
                     >
-                        {formik.isSubmitting
-                            ? 'Procesando...'
-                            : isEditMode ? 'Actualizar usuario' : 'Registrar usuario'}
+                        {getButtonText()}
                     </button>
                 </div>
             </form>
         </Dialog>
     );
+};
+
+// Función para preparar los datos del formulario
+const prepareFormData = (values, isEditMode) => {
+    const data = {
+        ...values,
+        birthdate: values.birthdate ? moment(values.birthdate).format('YYYY-MM-DD') : null
+    };
+
+    if (isEditMode && !values.password) {
+        delete data.password;
+    }
+
+    return data;
+};
+
+// Función para manejar el envío del formulario
+const handleFormSubmission = async (data, isEditMode, userToEdit, setVisible, formik, onSuccess) => {
+    try {
+        const response = isEditMode
+            ? await ClientService.editAgente({
+                id: userToEdit.id,
+                ...data
+            })
+            : await ClientService.saveAgente(data);
+
+        handleApiResponse(response, isEditMode, setVisible, formik, onSuccess);
+    } catch (error) {
+        handleApiError(error);
+    }
+};
+
+// Manejador de respuesta de la API
+const handleApiResponse = (response, isEditMode, setVisible, formik, onSuccess) => {
+    if (response.status === 'CREATED' || response.success) {
+        setVisible(false);
+        formik.resetForm();
+        showSuccessAlert(
+            response.message || (isEditMode ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente'),
+            () => onSuccess?.()
+        );
+    } else {
+        showErrorAlert(
+            response.message || (isEditMode ? 'Error al actualizar el usuario' : 'Error al crear el usuario')
+        );
+    }
+};
+
+// Manejador de errores de la API
+const handleApiError = (error) => {
+    console.error("Error al procesar la solicitud:", error);
+    showErrorAlert('Ocurrió un error al procesar la solicitud');
 };

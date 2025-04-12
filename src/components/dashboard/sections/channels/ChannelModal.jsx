@@ -11,6 +11,21 @@ import { ChannelService } from '../../../../services/ChannelService';
 import { CategoryService } from '../../../../services/CategoryService';
 import Swal from 'sweetalert2';
 
+// Helper function for field classes
+const getFieldClasses = (fieldName, formik, fieldType = 'input') => {
+    const baseClasses = {
+        input: 'min-h-10 pl-4 w-full border',
+        textarea: 'pl-4 w-full border',
+        autocomplete: 'w-full border rounded-lg'
+    };
+
+    const errorClasses = formik.touched[fieldName] && formik.errors[fieldName]
+        ? 'border-red-500'
+        : 'border-gray-300';
+
+    return `${baseClasses[fieldType]} ${errorClasses}`;
+};
+
 // Extracted validation schema
 const getValidationSchema = () => Yup.object().shape({
     name: Yup.string()
@@ -242,7 +257,7 @@ export const ChannelModal = ({ visible, setVisible, onSuccess, channelToEdit }) 
                             <InputText
                                 id="name"
                                 name="name"
-                                className={`border ${formik.touched.name && formik.errors.name ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                                className={getFieldClasses('name', formik)}
                                 value={formik.values.name}
                                 onChange={(e) => handleChange('name', e.target.value)}
                             />
@@ -259,7 +274,7 @@ export const ChannelModal = ({ visible, setVisible, onSuccess, channelToEdit }) 
                             <InputTextarea
                                 id="description"
                                 name="description"
-                                className={`border ${formik.touched.description && formik.errors.description ? 'border-red-500' : 'border-gray-300'} pl-4 w-full`}
+                                className={getFieldClasses('description', formik, 'textarea')}
                                 value={formik.values.description}
                                 onChange={(e) => handleChange('description', e.target.value)}
                                 rows={3} cols={30}
@@ -277,7 +292,7 @@ export const ChannelModal = ({ visible, setVisible, onSuccess, channelToEdit }) 
                             <InputText
                                 id="number"
                                 name="number"
-                                className={`border ${formik.touched.number && formik.errors.number ? 'border-red-500' : 'border-gray-300'} min-h-10 pl-4 w-full`}
+                                className={getFieldClasses('number', formik)}
                                 value={formik.values.number}
                                 onChange={(e) => handleChange('number', e.target.value)}
                             />
@@ -301,7 +316,7 @@ export const ChannelModal = ({ visible, setVisible, onSuccess, channelToEdit }) 
                                     onChange={(e) => handleChange('category', e.value)}
                                     field="name"
                                     itemTemplate={itemTemplate}
-                                    className={`w-full border rounded-lg ${formik.touched.category && formik.errors.category ? 'border-red-500' : 'border-gray-300'}`}
+                                    className={getFieldClasses('category', formik, 'autocomplete')}
                                     inputClassName="w-full min-h-10 pl-4"
                                     dropdown
                                     loading={loadingCategories}

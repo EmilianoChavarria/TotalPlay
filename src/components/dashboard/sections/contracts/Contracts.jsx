@@ -15,8 +15,8 @@ export const Contracts = () => {
   const [visibleD, setVisibleD] = useState(false);
   const [visibleG, setVisibleG] = useState(false);
   const [visibleContract, setVisibleContract] = useState(false);
-  const [clientContracts, setClientContracts] = useState({}); 
-  const [loadingContracts, setLoadingContracts] = useState({}); 
+  const [clientContracts, setClientContracts] = useState({});
+  const [loadingContracts, setLoadingContracts] = useState({});
 
   const menuRef = React.useRef(null);
 
@@ -108,32 +108,51 @@ export const Contracts = () => {
           setLoadingContracts(prev => ({ ...prev, [clientId]: true }));
           const response = await ContractService.cancelContract(contractId);
 
-          if (response.status === 'OK' || response.success) {
-            showSuccessAlert(response.message || 'Contrato cancelado exitosamente', () => {
-              setClientContracts(prev => {
-                const updatedContracts = { ...prev };
-                if (updatedContracts[clientId]) {
-                  updatedContracts[clientId] = updatedContracts[clientId].map(contract =>
-                    contract.id === contractId
-                      ? { ...contract, status: false }
-                      : contract
-                  );
-                }
-                return updatedContracts;
-              });
-            });
-          } else {
-            showErrorAlert(response.message || 'Ocurrió un error al cancelar el contrato');
-          }
+          handleCancelResponse(response, contractId, clientId);
         } catch (error) {
-          console.error("Error al cancelar el contrato:", error);
-          showErrorAlert('Ocurrió un error de conexión con el servidor');
+          handleCancelError(error);
         } finally {
           setLoadingContracts(prev => ({ ...prev, [clientId]: false }));
         }
       },
       () => console.log('Cancelación cancelada por el usuario')
     );
+  };
+
+  // Manejador de respuesta exitosa
+  const handleCancelResponse = (response, contractId, clientId) => {
+    const isSuccess = response.status === 'OK' || response.success;
+    const successMessage = response.message ?? 'Contrato cancelado exitosamente';
+    const errorMessage = response.message ?? 'Ocurrió un error al cancelar el contrato';
+
+    if (isSuccess) {
+      showSuccessAlert(successMessage, () => {
+        updateContractsState(contractId, clientId);
+      });
+    } else {
+      showErrorAlert(errorMessage);
+    }
+  };
+
+  // Actualiza el estado de los contratos
+  const updateContractsState = (contractId, clientId) => {
+    setClientContracts(prev => {
+      const updatedContracts = { ...prev };
+      if (updatedContracts[clientId]) {
+        updatedContracts[clientId] = updatedContracts[clientId].map(contract =>
+          contract.id === contractId
+            ? { ...contract, status: false }
+            : contract
+        );
+      }
+      return updatedContracts;
+    });
+  };
+
+  // Manejador de errores
+  const handleCancelError = (error) => {
+    console.error("Error al cancelar el contrato:", error);
+    showErrorAlert('Ocurrió un error de conexión con el servidor');
   };
 
 

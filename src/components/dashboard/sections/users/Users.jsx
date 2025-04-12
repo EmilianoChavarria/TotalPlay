@@ -29,7 +29,7 @@ export const Users = () => {
 
   const handleSuccess = () => {
     fetchUsers();
-    setSelectedUser(null); 
+    setSelectedUser(null);
   };
 
   const handleDeleteUser = async (userId) => {
@@ -53,14 +53,63 @@ export const Users = () => {
     );
   };
 
+  const renderTableBody = () => {
+    if (loading) {
+      return (
+        <tr>
+          <td colSpan="6" className="text-center py-6">
+            Cargando usuarios...
+          </td>
+        </tr>
+      );
+    }
+
+    if (users.length === 0) {
+      return (
+        <tr>
+          <td colSpan="6" className="text-center py-6 text-gray-500">
+            No se encontraron usuarios.
+          </td>
+        </tr>
+      );
+    }
+
+    return users.map((user) => (
+      <tr key={user.id} className="border-b border-gray-200">
+        <td className="px-6 py-4">{user.firstName}</td>
+        <td className="px-6 py-4">{user.lastName} {user.surname}</td>
+        <td className="px-6 py-4">{user.email}</td>
+        <td className="px-6 py-4">{user.phone}</td>
+        <td className="px-6 py-4">{user.rfc}</td>
+        <td className="px-6 py-4 flex gap-x-2">
+          <button
+            className="text-blue-500 hover:text-blue-700"
+            onClick={() => {
+              setSelectedUser(user);
+              setVisible(true);
+            }}
+          >
+            Editar
+          </button>
+          <button
+            className="text-red-500 hover:text-red-700"
+            onClick={() => handleDeleteUser(user.id)}
+          >
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    ));
+  };
+
   return (
     <>
       <div className='w-full flex flex-col md:flex-row items-center justify-between'>
         <h2 className='text-2xl font-semibold whitespace-nowrap'>Gestión de Usuarios</h2>
-        <button 
-          className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition' 
+        <button
+          className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition'
           onClick={() => {
-            setSelectedUser(null); 
+            setSelectedUser(null);
             setVisible(true);
           }}
         >
@@ -82,54 +131,15 @@ export const Users = () => {
             </tr>
           </thead>
           <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="6" className="text-center py-6">
-                  Cargando usuarios...
-                </td>
-              </tr>
-            ) : users.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="text-center py-6 text-gray-500">
-                  No se encontraron usuarios.
-                </td>
-              </tr>
-            ) : (
-              users.map((user) => (
-                <tr key={user.id} className="border-b border-gray-200">
-                  <td className="px-6 py-4">{user.firstName}</td>
-                  <td className="px-6 py-4">{user.lastName} {user.surname}</td>
-                  <td className="px-6 py-4">{user.email}</td>
-                  <td className="px-6 py-4">{user.phone}</td>
-                  <td className="px-6 py-4">{user.rfc}</td>
-                  <td className="px-6 py-4 flex gap-x-2">
-                    <button 
-                      className="text-blue-500 hover:text-blue-700"
-                      onClick={() => {
-                        setSelectedUser(user);
-                        setVisible(true);
-                      }}
-                    >
-                      Editar
-                    </button>
-                    <button 
-                      className="text-red-500 hover:text-red-700"
-                      onClick={() => handleDeleteUser(user.id)}
-                    >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
+            {renderTableBody()}
           </tbody>
         </table>
       </div>
 
-      <UserModal 
-        visible={visible} 
-        setVisible={setVisible} 
-        onSuccess={handleSuccess} 
+      <UserModal
+        visible={visible}
+        setVisible={setVisible}
+        onSuccess={handleSuccess}
         userToEdit={selectedUser}
       />
     </>
