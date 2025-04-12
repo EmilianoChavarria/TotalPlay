@@ -45,33 +45,23 @@ export const AddressModal = ({ visibleD, setVisibleD, user, onSuccess }) => {
         },
         validationSchema,
         onSubmit: async (values) => {
-            const data = {
-                ...values,
-                clientId: user.userId,
-            }
-            console.log("Datos", data);
-
             try {
-                const response = await AddressService.saveAddress(data);
-                console.log("Respuesta del servidor:", response);
+                const response = await AddressService.saveAddress({
+                    ...values,
+                    clientId: user.userId
+                });
 
-                if (response.status === 'OK' || response.success) {
-                    setVisibleD(false);
+                if (response.status === 'OK') {
+                    setVisibleD(false); // Solo cierra ESTE modal
                     formik.resetForm();
-                    showSuccessAlert(response.message || 'Dirección creada exitosamente', () => {
+                    showSuccessAlert('Dirección creada', () => {
                         if (onSuccess) {
-                            onSuccess();
+                            onSuccess(); // Esto llama a handleAddressSaved
                         }
-                    });
-                } else {
-                    setVisibleD(false);
-                    showErrorAlert(response.message || 'Ocurrió un error al crear la dirección', () => {
-                        setVisibleD(true);
                     });
                 }
             } catch (error) {
-                console.log("Error al crear la dirección:", error);
-                showErrorAlert('Ocurrió un error al procesar la solicitud');
+                showErrorAlert('Error al guardar');
             }
         }
     });

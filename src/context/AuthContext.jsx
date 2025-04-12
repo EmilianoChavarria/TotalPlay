@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
     const decodeToken = (token) => {
         try {
             const decoded = jwtDecode(token);
+            localStorage.setItem('id', decoded.sub);
             return {
                 roles: decoded.roles || [],
                 email: decoded.sub || '',

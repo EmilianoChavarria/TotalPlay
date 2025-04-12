@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { ClientService } from '../../../../services/ClientService';
 import { ClientModal } from './clients/ClientModal';
-import { Button } from 'primereact/button';
 import { Menu } from 'primereact/menu';
+import { AddressManageModals } from './clients/AddressManageModal';
 import { AddressModal } from './clients/AddressModal';
+import { ContractModal } from './ContractModal';
 
 export const Contracts = () => {
   const [expandedClient, setExpandedClient] = useState(null);
   const [visible, setVisible] = useState(false);
   const [visibleD, setVisibleD] = useState(false);
+  const [visibleG, setVisibleG] = useState(false);
+  const [visibleContract, setVisibleContract] = useState(false);
+
+
   const menuRef = React.useRef(null);
 
 
@@ -21,7 +26,7 @@ export const Contracts = () => {
   const menuItems = [
     {
       label: 'Agregar dirección',
-      icon: 'pi pi-home',
+      icon: 'pi pi-plus-circle',
       command: () => {
         // Aquí iría la lógica para editar
         setSelectedClient(user);
@@ -29,11 +34,20 @@ export const Contracts = () => {
       }
     },
     {
+      label: 'Direcciones',
+      icon: 'pi pi-home',
+      command: () => {
+        // Aquí iría la lógica para editar
+        setSelectedClient(user);
+        setVisibleG(true);
+      }
+    },
+    {
       label: 'Registrar contrato',
       icon: 'pi pi-plus',
       command: () => {
         // Aquí iría la lógica para editar
-        console.log('asd');
+        setVisibleContract(true);
       }
     },
     {
@@ -135,16 +149,19 @@ export const Contracts = () => {
                           name: client.name,
                           lastName: client.lastName,
                           surname: client.surname,
+                          email: client.email,
+                          rfc: client.rfc,
+                          phone: client.phone,
                         });
                         menuRef.current.toggle(e)
                       }}
                     >
-                      <i 
+                      <i
                         className={`pi pi-ellipsis-v p-2 rounded-lg text-gray-800 mx-auto `}
                         style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}
                         aria-controls="popup_menu"
                         aria-haspopup
-                    />
+                      />
                     </button>
 
                     <Menu
@@ -195,6 +212,11 @@ export const Contracts = () => {
       <ClientModal visible={visible} setVisible={setVisible} onSuccess={handleClientSave} />
 
       <AddressModal visibleD={visibleD} setVisibleD={setVisibleD} user={selectedClient} onSuccess={handleClientSave} />
+
+      <AddressManageModals visibleD={visibleG} setVisibleD={setVisibleG} user={user} />
+
+      <ContractModal user={user} visible={visibleContract} setVisible={setVisibleContract} />
+
     </>
   );
 };
