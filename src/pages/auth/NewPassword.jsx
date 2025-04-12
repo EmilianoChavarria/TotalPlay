@@ -3,8 +3,11 @@ import { InputText } from 'primereact/inputtext';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { AuthService } from '../../services/AuthService';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 export const NewPassword = () => {
+    const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
             password: '',
@@ -38,6 +41,8 @@ export const NewPassword = () => {
                     text: 'Tu contraseña ha sido cambiada exitosamente',
                     timer: 2000
                 });
+                localStorage.clear();
+                navigate('/');
 
             } catch (error) {
                 console.error('Error al cambiar contraseña:', error.message);
