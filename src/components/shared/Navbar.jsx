@@ -6,9 +6,7 @@ export const Navbar = ({ toggleCollapse }) => {
   const { hasRole, logout } = useAuth(); // Obtenemos la función logout del contexto
 
   const handleLogout = () => {
-    logout(); // Llamamos a la función logout al hacer clic
-    // No necesitas redireccionar manualmente si tu rutas están protegidas correctamente
-    // El redireccionamiento debería manejarse en tu configuración de rutas
+    logout(); 
   };
 
   return (

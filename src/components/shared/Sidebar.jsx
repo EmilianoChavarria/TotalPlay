@@ -1,9 +1,16 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../../assets/icons.jpg";
+import { useAuth } from "../../context/AuthContext";
 
 export const Sidebar = ({ items, collapsed, toggleCollapse, closeSidebarMobile }) => {
     const location = useLocation();
+
+    const { hasRole, logout } = useAuth();
+
+    const handleLogout = () => {
+        logout();
+    };
 
     const isActive = (link) => {
         return location.pathname === link ||
@@ -51,7 +58,7 @@ export const Sidebar = ({ items, collapsed, toggleCollapse, closeSidebarMobile }
 
                 <Link
                     to="/"
-                    onClick={handleLinkClick}
+                    onClick={handleLogout}
                     className="flex md:hidden items-center text-base py-3 px-4 hover:bg-gray-100 transition text-red-800 font-medium whitespace-nowrap"
                 >
                     <i className={`pi pi-sign-out mr-4 ${collapsed ? 'mx-auto' : 'mr-4'}`} style={{ fontSize: '1.2rem' }} />

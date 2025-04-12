@@ -6,6 +6,7 @@ import { Packages } from '../components/dashboard/sections/packages/Packages';
 import { Channels } from '../components/dashboard/sections/channels/Channels';
 import { Contracts } from '../components/dashboard/sections/contracts/Contracts';
 import { Reports } from '../components/dashboard/sections/reports/Reports';
+import { Users } from '../components/dashboard/sections/users/Users';
 import { SalesPackage } from '../components/dashboard/sections/packages/SalesPackage/SalesPackage';
 import { ChannelPackage } from '../components/dashboard/sections/packages/ChannelPackage/ChannelPackage';
 import { Login } from '../pages/auth/login/Login';
@@ -59,6 +60,14 @@ export const AppRoutes = () => {
                         element={
                             <ProtectedRoute requiredRoles={['ADMIN']}>
                                 <Channels />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="users"
+                        element={
+                            <ProtectedRoute requiredRoles={['ADMIN']}>
+                                <Users />
                             </ProtectedRoute>
                         }
                     />
