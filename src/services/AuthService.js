@@ -1,4 +1,6 @@
 import Swal from 'sweetalert2';
+import { jwtDecode } from 'jwt-decode';  // Importación corregida
+import { BASE_URL } from '../config/const';
 
 export const AuthService = {
     login: async (email, password) => {
@@ -17,7 +19,16 @@ export const AuthService = {
 
             const data = await response.json();
 
-            // Mostrar mensaje de éxito
+            if (data.token) {
+                const decoded = jwtDecode(data.token);  // Usa jwtDecode aquí
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('id', decoded.sub);
+
+                if (decoded.roles) {
+                    localStorage.setItem('roles', JSON.stringify(decoded.roles));
+                }
+            }
+
             await Swal.fire({
                 icon: 'success',
                 title: '¡Bienvenido!',
@@ -28,7 +39,6 @@ export const AuthService = {
 
             return data;
         } catch (error) {
-            // Mostrar mensaje de error
             await Swal.fire({
                 icon: 'error',
                 title: 'Error',
@@ -40,7 +50,11 @@ export const AuthService = {
     },
 
     logout: () => {
-        sessionStorage.removeItem("jwt");
+        // Limpiar todos los datos de autenticación
+        localStorage.removeItem("token");
+        localStorage.removeItem("id");
+        localStorage.removeItem("roles");
+
         // Opcional: Mostrar mensaje al cerrar sesión
         Swal.fire({
             icon: 'info',
@@ -55,8 +69,17 @@ export const AuthService = {
         const token = localStorage.getItem("token");
         if (!token) return null;
 
-        const payload = JSON.parse(atob(token.split(".")[1])); // Decodifica el token
-        return payload.roles[0]; // Retorna el primer rol
+        try {
+            const decoded = jwt_decode(token); // Usamos jwt-decode en lugar de atob
+            return decoded.roles ? decoded.roles[0] : null; // Retorna el primer rol si existe
+        } catch (error) {
+            console.error("Error al decodificar el token:", error);
+            return null;
+        }
+    },
+
+    getUserId: () => {
+        return localStorage.getItem("id"); // Función adicional para obtener el ID
     },
 
     sendEmail: async (email) => {
@@ -67,7 +90,7 @@ export const AuthService = {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
-                body: new URLSearchParams({ email }) // aquí va el correo
+                body: new URLSearchParams({ email })
             });
             console.log(response);
 
@@ -95,6 +118,38 @@ export const AuthService = {
                 text: error.message || 'Ocurrió un error al enviar el correo',
                 confirmButtonText: 'Entendido'
             });
+            throw error;
+        }
+    },
+
+    changePassword: async (data) => {
+        try {
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                throw new Error('No hay token de autenticación');
+            }
+
+            const response = await fetch(`${BASE_URL}/user/forward-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: new URLSearchParams({
+                    userId: data.userId,
+                    password: data.password
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al cambiar la contraseña');
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error("Error en changePassword:", error);
             throw error;
         }
     }

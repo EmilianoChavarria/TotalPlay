@@ -2,6 +2,7 @@ import React from 'react';
 import { InputText } from 'primereact/inputtext';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { AuthService } from '../../services/AuthService';
 
 export const NewPassword = () => {
     const formik = useFormik({
@@ -21,8 +22,43 @@ export const NewPassword = () => {
                 .oneOf([Yup.ref('password'), null], 'Las contraseñas no coinciden'),
         }),
         onSubmit: async (values) => {
-            console.log('Nueva contraseña enviada:', values.password);
-            // Aquí puedes llamar a tu servicio para actualizar la contraseña
+            try {
+                console.log('Cambiando contraseña...', values);
+
+                const response = await AuthService.changePassword({
+                    userId: localStorage.getItem("id"),
+                    password: values.password
+                });
+
+                console.log('Contraseña cambiada con éxito:', response);
+
+                // Mostrar alerta de éxito
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Contraseña actualizada',
+                    text: 'Tu contraseña ha sido cambiada exitosamente',
+                    timer: 2000
+                });
+
+            } catch (error) {
+                console.error('Error al cambiar contraseña:', error.message);
+
+                // Mostrar alerta de error específica
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message.includes('401')
+                        ? 'No autorizado - Por favor inicia sesión nuevamente'
+                        : 'Error al cambiar la contraseña',
+                    confirmButtonText: 'Entendido'
+                });
+
+                // Opcional: Redirigir a login si es error 401
+                if (error.message.includes('401')) {
+                    AuthService.logout();
+                    navigate('/login');
+                }
+            }
         },
     });
 

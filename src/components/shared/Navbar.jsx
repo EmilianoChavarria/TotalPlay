@@ -3,8 +3,13 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext';
 
 export const Navbar = ({ toggleCollapse }) => {
+  const { hasRole, logout } = useAuth(); // Obtenemos la función logout del contexto
 
-  const { hasRole } = useAuth();
+  const handleLogout = () => {
+    logout(); // Llamamos a la función logout al hacer clic
+    // No necesitas redireccionar manualmente si tu rutas están protegidas correctamente
+    // El redireccionamiento debería manejarse en tu configuración de rutas
+  };
 
   return (
     <div className='border-b border-gray-200 h-[4.3rem] flex items-center justify-between px-4 md:px-10'>
@@ -32,13 +37,16 @@ export const Navbar = ({ toggleCollapse }) => {
           )}
         </div>
         <div className='hidden md:block'>
-          <Link className='flex items-center border border-white rounded-md p-2 justify-center hover:border-red-600 hover:text-red-700 transition duration-150' to='/'>
+          <button 
+            onClick={handleLogout}
+            className='flex items-center border border-white rounded-md p-2 justify-center hover:border-red-600 hover:text-red-700 transition duration-150'
+          >
             <i
               className={`pi pi-sign-out mr-2 `}
               style={{ fontSize: '1.2rem' }}
             />
             <span className='hidden md:block'>Cerrar sesión</span>
-          </Link>
+          </button>
         </div>
       </div>
     </div>

@@ -28,7 +28,7 @@ export const Login = () => {
             .required("La contraseña es obligatoria")
             .min(8, "Mínimo 8 caracteres")
             .matches(
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&]{8,}$/,
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.,:;¿¡\-_+=#~()[\]{}|^<>/\\])[A-Za-z\d@$!%*?&.,:;¿¡\-_+=#~()[\]{}|^<>/\\]{8,}$/,
                 "Debe contener al menos una mayúscula, una minúscula, un número y un carácter especial"
             ),
     });
@@ -45,10 +45,10 @@ export const Login = () => {
             try {
                 const response = await AuthService.login(values.email, values.password);
                 console.log('Respuesta del servidor:', response);
-        
+
                 if (response.jwt) {
                     login(response.jwt); // Guardas el token en contexto
-        
+
                     if (response.temporal === "true") {
                         navigate('/new-password'); // Redirige si la contraseña es temporal
                     } else {
@@ -59,7 +59,7 @@ export const Login = () => {
                 console.error('Error en el inicio de sesión:', error);
             }
         },
-        
+
     });
 
     // Handler para cambios en los inputs
@@ -77,7 +77,7 @@ export const Login = () => {
         if (localStorage.getItem('token')) {
             navigate('/dashboard/home');
         }
-    }, [ navigate]);
+    }, [navigate]);
 
     return (
         <div className='h-screen w-full bg-gray-100 flex items-center justify-center'>

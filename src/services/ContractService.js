@@ -1,3 +1,4 @@
+import { data } from "autoprefixer";
 import { BASE_URL, token } from "../config/const";
 
 export const ContractService = {
@@ -33,4 +34,54 @@ export const ContractService = {
 
         return await response.json();
     },
+
+    getAllContracts: async () => {
+        const response = await fetch(`${BASE_URL}/contract/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Error fetching contracts');
+        }
+
+        return await response.json();
+    },
+
+    findByAgent: async (agentId) => {
+        const response = await fetch(`${BASE_URL}/contract/findByAgent/${agentId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Error fetching contracts');
+        }
+
+        return await response.json();
+    },
+
+    cancelContract: async (contractId) => {
+        const response = await fetch(`${BASE_URL}/contract/delete/${contractId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Error canceling contract');
+        }
+
+        return await response.json();
+    },
+
+    
 }

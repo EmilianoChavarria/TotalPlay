@@ -7,6 +7,7 @@ import { AddressManageModals } from './clients/AddressManageModal';
 import { AddressModal } from './clients/AddressModal';
 import { ContractModal } from './ContractModal';
 import { Button } from 'primereact/button';
+import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../CustomAlerts';
 
 export const Contracts = () => {
   const [expandedClient, setExpandedClient] = useState(null);
@@ -97,6 +98,44 @@ export const Contracts = () => {
       setLoadingContracts(prev => ({ ...prev, [clientId]: false }));
     }
   };
+
+  const cancelContract = async (contractId, clientId) => {
+    showConfirmAlert(
+      '¿Estás seguro de que deseas cancelar este contrato?',
+      async () => {
+        try {
+          setLoadingContracts(prev => ({ ...prev, [clientId]: true }));
+          const response = await ContractService.cancelContract(contractId);
+
+          if (response.status === 'OK' || response.success) {
+            showSuccessAlert(response.message || 'Contrato cancelado exitosamente', () => {
+              // Actualización segura del estado
+              setClientContracts(prev => {
+                const updatedContracts = { ...prev };
+                if (updatedContracts[clientId]) {
+                  updatedContracts[clientId] = updatedContracts[clientId].map(contract =>
+                    contract.id === contractId
+                      ? { ...contract, status: false }
+                      : contract
+                  );
+                }
+                return updatedContracts;
+              });
+            });
+          } else {
+            showErrorAlert(response.message || 'Ocurrió un error al cancelar el contrato');
+          }
+        } catch (error) {
+          console.error("Error al cancelar el contrato:", error);
+          showErrorAlert('Ocurrió un error de conexión con el servidor');
+        } finally {
+          setLoadingContracts(prev => ({ ...prev, [clientId]: false }));
+        }
+      },
+      () => console.log('Cancelación cancelada por el usuario')
+    );
+  };
+
 
   const handleClientSave = () => {
     fetchClients();
@@ -225,7 +264,10 @@ export const Contracts = () => {
                                     </span>
                                   </div>
                                   <div className='flex gap-x-2 items-center justify-center ml-4'>
-                                    <Button tooltip="Cancelar contrato" tooltipOptions={{ position: 'bottom' }}>
+                                    <Button tooltip="Cancelar contrato" tooltipOptions={{ position: 'bottom' }} onClick={() => {
+                                      cancelContract(contract.id);
+
+                                    }}>
                                       <i className="pi pi-times-circle text-red-500" style={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
                                     </Button>
                                   </div>
