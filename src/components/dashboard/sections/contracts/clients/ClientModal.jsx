@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import * as Yup from 'yup';
 import { ClientService } from '../../../../../services/ClientService';
-import { showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
+import { showErrorAlert } from '../../../../CustomAlerts';
 import { BaseFormModal } from '../../../../BaseFormModal';
 import { DateField, TextField } from '../../../../TextField';
 import { handleApiResponse } from '../../../../FormUtils';
