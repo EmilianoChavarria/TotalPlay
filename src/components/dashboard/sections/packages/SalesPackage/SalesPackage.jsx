@@ -134,7 +134,7 @@ export const SalesPackage = () => {
                             <div className='flex items-center justify-between pt-2 pb-4 border-b border-gray-200'>
                                 <div className='flex items-center justify-start'>
                                     <i className="pi pi-wifi mr-2 text-gray-800" style={{ fontSize: '1.2rem' }} />
-                                    <span className='text-gray-600'>300 Mbps</span>
+                                    <span className='text-gray-600'>{item.speed} Mbps</span>
                                 </div>
                                 <span className='text-2xl font-bold text-blue-600'>${item.totalAmount}/mes</span>
                             </div>
