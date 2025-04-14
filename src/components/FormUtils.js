@@ -16,7 +16,6 @@ export const getFieldClasses = (fieldName, formik, fieldType = 'input') => {
 export const handleApiResponse = (response, isEditMode, setVisible, formik, onSuccess, entityName) => {
     if (response.status === 'OK' || response.success) {
         setVisible(false);
-        formik.resetForm();
         showSuccessAlert(
             response.message || (isEditMode ? `${entityName} actualizado exitosamente` : `${entityName} creado exitosamente`),
             () => onSuccess?.()

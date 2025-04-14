@@ -71,6 +71,22 @@ export const ClientService = {
         }
     },
 
+    deleteUser: async (agentId) => {
+        try {
+            const response = await fetch(`${BASE_URL}/user/deleteAgente/${agentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            return error;
+        }
+    },
+
     editAgente: async (agent) => {
         try {
             const response = await fetch(`${BASE_URL}/user/UpdateAgente`, {

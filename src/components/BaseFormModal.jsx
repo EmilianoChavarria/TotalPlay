@@ -27,7 +27,6 @@ export const BaseFormModal = ({
             className='w-full md:w-[40vw]'
             onHide={() => {
                 setVisible(false);
-                formik.resetForm();
             }}
         >
             <form onSubmit={formik.handleSubmit} className="p-fluid">

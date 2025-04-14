@@ -321,7 +321,7 @@ const handleFormSubmission = async (data, isEditMode, userToEdit, setVisible, fo
 
 // Manejador de respuesta de la API
 const handleApiResponse = (response, isEditMode, setVisible, formik, onSuccess) => {
-    if (response.status === 'CREATED' || response.success) {
+    if (response.status === 'OK' || response.success) {
         setVisible(false);
         formik.resetForm();
         showSuccessAlert(

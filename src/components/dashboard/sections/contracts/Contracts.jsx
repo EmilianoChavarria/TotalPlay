@@ -285,6 +285,12 @@ export const Contracts = () => {
                         menuRef.current.toggle(e);
                       }}
                     >
+                      <Menu
+                        model={menuItems}
+                        popup
+                        ref={menuRef}
+                        id="popup_menu"
+                        className="text-sm" />
                       <i
                         className={`pi pi-ellipsis-v p-2 rounded-lg text-gray-800 mx-auto`}
                         style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}
