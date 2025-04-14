@@ -2,11 +2,38 @@ import React, { useEffect, useState } from 'react'
 import { DashboardCard } from '../../../cards/DashboardCard'
 import { useAuth } from '../../../../context/AuthContext';
 import { ContractService } from '../../../../services/ContractService';
+import { StatsService } from '../../../../services/StatsService';
 
 export const Dashboard = () => {
   const { hasRole } = useAuth();
+  const [countPackages, setCountPackages] = useState(0);
+  const [countContracts, setCountContracts] = useState(0);
+  const [countClients, setCountClients] = useState(0);
+  const [countChannels, setCountChannels] = useState(0);
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const getStats = async () => {
+    try { 
+        const response = await StatsService.countPackages();
+        const response1 = await StatsService.countClients();
+        const response2 = await StatsService.countContracts();
+        const response3 = await StatsService.countChannels();
+
+        console.log("Count de paquetes", response);
+        console.log("Count de clientes", response1);
+        console.log("Count de contratos", response2);
+        console.log("Count de canales", response3);
+        setCountPackages(response.data);
+        setCountClients(response1.data);
+        setCountContracts(response2.data);
+        setCountChannels(response3.data);
+    } catch (error) {
+      console.error("Error al obtener contratos:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const getContractsByAgent = async () => {
     try {
@@ -86,6 +113,7 @@ export const Dashboard = () => {
   };
 
   useEffect(() => {
+    getStats();
     getContractsByAgent();
   }, []);
 
@@ -93,18 +121,18 @@ export const Dashboard = () => {
     <div className="flex flex-col gap-4">
       <section className='flex flex-col gap-y-2 md:flex-row md:justify-start md:items-center md:gap-x-8'>
         <div className='w-full md:w-[23%]'>
-          <DashboardCard name='Paquetes' quantity={10} icon='pi pi-box' />
+          <DashboardCard name='Paquetes' quantity={countPackages} icon='pi pi-box' />
         </div>
         <div className='w-full md:w-[23%]'>
-          <DashboardCard name='Contratos activos' quantity={contracts.length} icon='pi pi-file' />
+          <DashboardCard name='Contratos activos' quantity={countContracts} icon='pi pi-file' />
         </div>
         {hasRole('ADMIN') && (
           <div className='w-full md:w-[23%]'>
-            <DashboardCard name='Total de canales' quantity={10} icon='pi pi-desktop' />
+            <DashboardCard name='Total de canales' quantity={countChannels} icon='pi pi-desktop' />
           </div>
         )}
         <div className='w-full md:w-[23%]'>
-          <DashboardCard name='Clientes' quantity={10} icon='pi pi-box' />
+          <DashboardCard name='Clientes' quantity={countClients} icon='pi pi-box' />
         </div>
       </section>
 
