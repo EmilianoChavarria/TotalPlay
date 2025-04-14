@@ -54,6 +54,22 @@ export const ClientService = {
         }
     },
 
+    deleteClient: async (clientId) => {
+        try {
+            const response = await fetch(`${BASE_URL}/client/delete/${clientId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            return error;
+        }
+    },
+
     saveAgente: async (agent) => {
         try {
             const response = await fetch(`http://localhost:8080/auth/registerAgente`, {

@@ -60,7 +60,8 @@ export const Contracts = () => {
       label: 'Eliminar',
       icon: 'pi pi-trash',
       command: () => {
-        console.log('asd');
+        // Aquí puedes agregar la lógica para eliminar el cliente
+        deleteClient(user.userId);
       }
     }
   ];
@@ -158,6 +159,33 @@ export const Contracts = () => {
 
   const handleClientSave = () => {
     fetchClients();
+  };
+
+  const deleteClient = async (id) => {
+    showConfirmAlert(
+      '¿Estás seguro de que deseas eliminar este cliente?',
+      async () => {
+
+        try {
+          const response = await ClientService.deleteClient(id);
+          console.log("response en deleteClient: ", response)
+          console.log(response)
+          if (response.status === 'OK') {
+            showSuccessAlert(response.message, () => {
+              fetchClients();
+            });
+          } else {
+            showErrorAlert(response.message || 'Ocurrió un error al eliminar el cliente');
+          }
+        } catch (error) {
+          console.error("Error al eliminar el canal:", error);
+          showErrorAlert('Ocurrió un error de conexión con el servidor');
+        }
+      },
+      () => {
+        console.log('Eliminación cancelada por el usuario');
+      }
+    );
   };
 
   useEffect(() => {

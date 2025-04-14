@@ -22,7 +22,7 @@ export const Layout = () => {
                 ...baseItems,
                 { name: "Canales", link: "/dashboard/channels", icon: "pi pi-desktop" },
                 { name: "Reportes", link: "/dashboard/reports", icon: "pi pi-chart-bar" },
-                { name: "Usuarios", link: "/dashboard/users", icon: "pi pi-user" }
+                { name: "Agentes de ventas", link: "/dashboard/users", icon: "pi pi-user" }
             ];
         }
 
