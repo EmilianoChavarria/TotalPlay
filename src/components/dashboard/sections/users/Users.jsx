@@ -118,7 +118,7 @@ export const Users = () => {
         </button>
       </div>
 
-      <div className="mt-6 overflow-x-auto w-full">
+      <div className="mt-6 overflow-x-auto w-full bg-white p-2 rounded lg">
         <table className="min-w-full w-full text-sm text-left rtl:text-right text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-100">
             <tr>
