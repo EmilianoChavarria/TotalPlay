@@ -18,7 +18,12 @@ export const Users = () => {
       setLoading(true);
       const response = await ClientService.findAllUsers();
       console.log("Respuesta del servidor:", response);
-      setUsers(response.data.body.data || []);
+
+      const filteredUsers = (response.data.body.data || []).filter(user =>
+        user.roleBeans && user.roleBeans[0] && user.roleBeans[0].name === 'USER'
+      );
+
+      setUsers(filteredUsers);
     } catch (error) {
       console.log("Error al obtener los usuarios:", error);
       showErrorAlert('Ocurrió un error al obtener los usuarios');
