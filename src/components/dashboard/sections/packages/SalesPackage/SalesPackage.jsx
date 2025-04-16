@@ -8,8 +8,8 @@ import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../../
 
 export const SalesPackage = () => {
     const { hasRole } = useAuth();
-    const menuRef = useRef(null); 
-    const [selectedPackage, setSelectedPackage] = useState(null); 
+    const menuRef = useRef(null);
+    const [selectedPackage, setSelectedPackage] = useState();
 
     const [visible, setVisible] = useState(false);
     const [visibleChannel, setVisibleChannel] = useState(false);
@@ -34,7 +34,7 @@ export const SalesPackage = () => {
                     console.log(response)
                     if (response.status === 'OK') {
                         showSuccessAlert(response.message, () => {
-                            getSalesPackage(); 
+                            getSalesPackage();
                             setSelectedPackage(null);
                         });
                     } else {
@@ -52,15 +52,6 @@ export const SalesPackage = () => {
     };
 
     const menuItems = [
-        {
-            label: 'Editar',
-            icon: 'pi pi-pencil',
-            command: () => {
-                if (selectedPackage) {
-                    console.log('Editar paquete:', selectedPackage.id);
-                }
-            }
-        },
         {
             label: 'Eliminar',
             icon: 'pi pi-trash',
@@ -113,7 +104,7 @@ export const SalesPackage = () => {
                                             className="pi pi-ellipsis-v p-2 rounded-lg text-gray-800 hover:bg-gray-100 cursor-pointer"
                                             style={{ fontSize: '0.9rem' }}
                                             onClick={(e) => {
-                                                setSelectedPackage(item); 
+                                                setSelectedPackage(item);
                                                 menuRef.current.toggle(e);
                                             }}
                                             aria-controls="popup_menu"
@@ -152,7 +143,8 @@ export const SalesPackage = () => {
                                     </div>
                                     <button
                                         className='hover:bg-gray-100 rounded-md flex items-center'
-                                        onClick={() => setVisibleChannel(true)}
+                                        onClick={() => { setSelectedPackage(item); 
+                                            setVisibleChannel(true);}}
                                     >
                                         <i className="pi pi-eye p-2 text-gray-800 cursor-pointer" />
                                         <span className='text-gray-800 hover:text-blue-500'>ver canales</span>

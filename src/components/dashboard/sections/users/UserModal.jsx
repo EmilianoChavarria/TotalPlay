@@ -32,6 +32,8 @@ const getInitialValues = (isEditMode, userToEdit) => ({
     email: isEditMode ? userToEdit.email : '',
     password: '',
     phone: isEditMode ? userToEdit.phone : '',
+    status: isEditMode ? userToEdit.status : true,
+
     birthdate: isEditMode && userToEdit.birthdate ? new Date(userToEdit.birthdate) : null,
 });
 
@@ -101,7 +103,8 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
             .required("El teléfono es obligatorio")
             .matches(/^\d{10}$/, "El teléfono no es válido"),
         birthdate: Yup.string()
-            .required("La fecha de nacimiento es obligatoria")
+            .required("La fecha de nacimiento es obligatoria"),
+        status: Yup.boolean().required('El estatus es obligatorio'),
     });
 
     const formik = useFormik({
@@ -142,21 +145,48 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
             }}
         >
             <form onSubmit={formik.handleSubmit} className='mt-8'>
-                <div className='mt-4'>
-                    <FloatLabel className='w-full'>
-                        <InputText
-                            id="firstName"
-                            name="firstName"
-                            className={getFieldClasses('firstName', formik)}
-                            value={formik.values.firstName}
-                            onChange={(e) => handleChange('firstName', e.target.value)}
-                        />
-                        <label htmlFor="firstName">Nombre</label>
-                    </FloatLabel>
-                    {formik.touched.firstName && formik.errors.firstName && (
-                        <div className="text-red-500 text-xs mt-1">{formik.errors.firstName}</div>
+                <div className={`${formik.touched.firstName && formik.errors.firstName ? 'mt-8' : 'mt-7'} w-full flex flex-col justify-between items-start md:flex-row`}>
+
+                    <div className={`w-full ${isEditMode ? 'md:w-[47%]' : 'md:w-full'}`}>
+                        <FloatLabel className="w-full">
+                            <InputText
+                                id="firstName"
+                                name="firstName"
+                                className={getFieldClasses('firstName', formik)}
+                                value={formik.values.firstName}
+                                onChange={(e) => handleChange('firstName', e.target.value)}
+                            />
+                            <label htmlFor="firstName">Nombre</label>
+                        </FloatLabel>
+                        {formik.touched.firstName && formik.errors.firstName && (
+                            <div className="text-red-500 text-xs mt-1">{formik.errors.firstName}</div>
+                        )}
+                    </div>
+                    {isEditMode && (
+                        <div className="w-full md:w-[37%] md:mt-0 flex flex-row items-center ">
+
+                            <label htmlFor="status" className="text-[12px] text-gray-500 mb-2">
+                                Estatus: {formik.values.status ? 'Activo' : 'Inactivo'}
+                            </label>
+
+                            <button
+                                type="button"
+                                role="switch"
+                                aria-checked={formik.values.status}
+                                onClick={() => {
+                                    formik.setFieldValue('status', !formik.values.status);
+                                }}
+                                className={`relative inline-flex h-5 w-11  mb-1 ml-3  items-center rounded-full transition-colors duration-250 
+                            ${formik.values.status ? 'bg-blue-500' : 'bg-gray-300'}`}>
+
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-250 
+                            ${formik.values.status ? 'translate-x-6' : 'translate-x-1'}`}
+                                />
+                            </button>
+                        </div>
                     )}
                 </div>
+
 
                 <div className={`${formik.touched.firstName && formik.errors.firstName ? 'mt-8' : 'mt-7'} w-full flex flex-col justify-between items-start md:flex-row`}>
                     <div className='w-full md:w-[47%]'>

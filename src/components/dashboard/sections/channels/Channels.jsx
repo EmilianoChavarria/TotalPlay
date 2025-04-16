@@ -11,6 +11,7 @@ import { showConfirmAlert, showErrorAlert, showSuccessAlert } from '../../../Cus
 export const Channels = () => {
 
   const [visible, setVisible] = useState(false);
+  
   const [channelToEdit, setChannelToEdit] = useState(null);
 
 
@@ -118,7 +119,7 @@ export const Channels = () => {
       {/* Contenedor del encabezado */}
       <div className='w-full flex flex-col md:flex-row items-center justify-between'>
         <h2 className='text-2xl font font-semibold whitespace-nowrap' >Gestión de Canales</h2>
-        <button className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition ' onClick={() => setVisible(true)}>
+        <button className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition ' onClick={() =>{ setChannelToEdit(null); setVisible(true);} }>
           <i className={`pi pi-plus mr-2`}
             style={{ fontSize: '1rem', verticalAlign: 'middle' }}
           />

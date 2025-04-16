@@ -13,14 +13,18 @@ export const AuthService = {
                 body: JSON.stringify({ email, password }),
             });
 
-            if (!response.ok) {
-                throw new Error("Credenciales incorrectas");
-            }
-
             const data = await response.json();
 
+
+            if (!response.ok) {
+                const errorMessage =  data.Error || "Error al enviar el correo";
+                throw new Error(errorMessage);
+
+            }
+
+
             if (data.token) {
-                const decoded = jwtDecode(data.token);  // Usa jwtDecode aquí
+                const decoded = jwtDecode(data.token);  
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('id', decoded.sub);
 
@@ -92,13 +96,14 @@ export const AuthService = {
                 },
                 body: new URLSearchParams({ email })
             });
-            console.log(response);
+
+            const data = await response.json(); // <-- Mover esto arriba
 
             if (!response.ok) {
-                throw new Error("Error al enviar el correo");
+                throw new Error(data.message || "Error al enviar el correo"); 
+            
             }
 
-            const data = await response.json();
 
             // Mostrar mensaje de éxito
             await Swal.fire({

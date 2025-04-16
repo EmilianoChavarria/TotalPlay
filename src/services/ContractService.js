@@ -65,7 +65,22 @@ export const ContractService = {
 
         return await response.json();
     },
+    findAllByAgent: async (agentId) => {
+        const response = await fetch(`${BASE_URL}/contract/findContractsAgent/${agentId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        });
 
+        if (!response.ok) {
+            throw new Error('Error fetching contracts');
+        }
+
+        return await response.json();
+    },
+    
     cancelContract: async (contractId) => {
         const response = await fetch(`${BASE_URL}/contract/delete/${contractId}`, {
             method: 'DELETE',

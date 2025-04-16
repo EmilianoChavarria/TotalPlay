@@ -3,37 +3,40 @@ import { ChannelListModal } from './ChannelListModal';
 import { Menu } from 'primereact/menu';
 import { ChannelPackageService } from '../../../../../services/ChannelPackageService';
 import { showErrorAlert, showSuccessAlert } from '../../../../CustomAlerts';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import Swal from 'sweetalert2';
 
 export const CardPackage = ({ channelPackage, onEdit, onDeleteSuccess }) => {
     const [visibleListModal, setVisibleListModal] = useState(false);
     const menuRef = React.useRef(null);
 
+
     const handleDelete = async () => {
-        confirmDialog({
-            message: '¿Estás seguro de que deseas eliminar este paquete?',
-            header: 'Confirmar eliminación',
-            icon: 'pi pi-exclamation-triangle',
-            acceptClassName: 'p-button-danger',
-            accept: async () => {
-                try {
-                    const response = await ChannelPackageService.deleteChannelPackage(channelPackage.id);
-                    
-                    if (response.status === 'OK') {
-                        showSuccessAlert(response.message);
-                        if (onDeleteSuccess) onDeleteSuccess();
-                    } else {
-                        showErrorAlert(response.message || 'Error al eliminar el paquete');
-                    }
-                } catch (error) {
-                    console.error("Error al eliminar:", error);
-                    showErrorAlert('Error de conexión con el servidor');
-                }
-            },
-            reject: () => {
-                console.log('Eliminación cancelada');
-            }
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: '¿Deseas eliminar este paquete de canales?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
         });
+    
+        if (result.isConfirmed) {
+            try {
+                const response = await ChannelPackageService.deleteChannelPackage(channelPackage.id);
+    
+                if (response.status === 'OK') {
+                    showSuccessAlert(response.message || 'Paquete eliminado correctamente');
+                    if (onDeleteSuccess) onDeleteSuccess(); // Actualiza la lista desde el padre
+                } else {
+                    showErrorAlert(response.message || 'Error al eliminar el paquete');
+                }
+            } catch (error) {
+                console.error("Error al eliminar:", error);
+                showErrorAlert('Error de conexión con el servidor');
+            }
+        }
     };
 
     const menuItems = [
@@ -53,7 +56,6 @@ export const CardPackage = ({ channelPackage, onEdit, onDeleteSuccess }) => {
 
     return (
         <>
-            <ConfirmDialog />
             
             <div className='bg-white h-fit rounded-lg py-6 px-4 shadow-sm hover:shadow-md transition-shadow'>
                 {/* Encabezado de la card */}

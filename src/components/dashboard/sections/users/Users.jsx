@@ -96,12 +96,6 @@ export const Users = () => {
           >
             Editar
           </button>
-          <button
-            className="text-red-500 hover:text-red-700"
-            onClick={() => handleDeleteUser(user.id)}
-          >
-            Eliminar
-          </button>
         </td>
       </tr>
     ));
@@ -143,7 +137,11 @@ export const Users = () => {
 
       <UserModal
         visible={visible}
-        setVisible={setVisible}
+        setVisible={(v) => {
+          setVisible(v);
+          if (!v) setSelectedUser(null);
+        }}
+
         onSuccess={handleSuccess}
         userToEdit={selectedUser}
       />
