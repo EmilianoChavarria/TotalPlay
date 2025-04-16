@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react';
 import { DashboardCard } from '../../../cards/DashboardCard'
 import { useAuth } from '../../../../context/AuthContext';
 import { ContractService } from '../../../../services/ContractService';
@@ -12,22 +12,23 @@ export const Dashboard = () => {
   const [countChannels, setCountChannels] = useState(0);
   const [contracts, setContracts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mostrarInactivos, setMostrarInactivos] = useState(false);
 
   const getStats = async () => {
-    try { 
-        const response = await StatsService.countPackages();
-        const response1 = await StatsService.countClients();
-        const response2 = await StatsService.countContracts();
-        const response3 = await StatsService.countChannels();
+    try {
+      const response = await StatsService.countPackages();
+      const response1 = await StatsService.countClients();
+      const response2 = await StatsService.countContracts();
+      const response3 = await StatsService.countChannels();
 
-        console.log("Count de paquetes", response);
-        console.log("Count de clientes", response1);
-        console.log("Count de contratos", response2);
-        console.log("Count de canales", response3);
-        setCountPackages(response.data);
-        setCountClients(response1.data);
-        setCountContracts(response2.data);
-        setCountChannels(response3.data);
+      console.log("Count de paquetes", response);
+      console.log("Count de clientes", response1);
+      console.log("Count de contratos", response2);
+      console.log("Count de canales", response3);
+      setCountPackages(response.data);
+      setCountClients(response1.data);
+      setCountContracts(response2.data);
+      setCountChannels(response3.data);
     } catch (error) {
       console.error("Error al obtener contratos:", error);
     } finally {
@@ -39,7 +40,7 @@ export const Dashboard = () => {
     try {
       const agentId = localStorage.getItem("id");
       if (agentId) {
-        const response = await ContractService.findByAgent(agentId);
+        const response = await ContractService.findAllByAgent(agentId);
         console.log("Contratos del agente:", response);
         setContracts(response.data);
       } else {
@@ -66,7 +67,7 @@ export const Dashboard = () => {
         <table className="min-w-[700px] w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase dark:text-gray-400">
             <tr className='bg-gray-100'>
-              <th scope="col" className="px-6 py-3">ID</th>
+              <th scope="col" className="hidden px-6 py-3">ID</th>
               <th scope="col" className="px-6 py-3">Servicio</th>
               <th scope="col" className="px-6 py-3">Precio</th>
               <th scope="col" className="px-6 py-3">Estado</th>
@@ -92,24 +93,33 @@ export const Dashboard = () => {
       );
     }
 
-    return contracts.map((contract) => (
-      <tr key={contract.id} className="border-b border-gray-200 dark:border-gray-700">
-        <td className="px-6 py-4">{contract.id}</td>
-        <td className="px-6 py-4">{contract.salesPackageEntity?.name || 'N/A'}</td>
-        <td className="px-6 py-4">${contract.salesPackageEntity?.totalAmount || 'N/A'}/mes</td>
-        <td className="px-6 py-4">
-          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${contract.status === true
-              ? 'bg-green-100 text-green-800'
-              : 'bg-red-100 text-red-800'
-            }`}>
-            {contract.status === true ? 'Activo' : 'Inactivo'}
-          </span>
-        </td>
-        <td className="px-6 py-4">
-          {contract.creationDate ? new Date(contract.creationDate).toLocaleDateString() : 'N/A'}
-        </td>
-      </tr>
-    ));
+    return contracts
+      .sort((a, b) => (b.status === true) - (a.status === true))
+      .filter((contract) => mostrarInactivos || contract.status === true)
+      .map((contract) => (
+        <tr key={contract.id} className="border-b border-gray-200 dark:border-gray-700">
+          <td className="hidden px-6 py-3">{contract.id}</td>
+          <td className="px-6 py-4">{contract.salesPackageEntity?.name || 'N/A'}</td>
+          <td className="px-6 py-4">${contract.salesPackageEntity?.totalAmount || 'N/A'}/mes</td>
+          <td className="px-6 py-4">
+            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${contract.status === true
+                ? 'bg-green-100 text-green-800'
+                : 'bg-red-100 text-red-800'
+              }`}>
+              {contract.status === true ? 'Activo' : 'Inactivo'}
+            </span>
+          </td>
+          <td className="px-6 py-4">
+            {contract.creationDate ? new Date(contract.creationDate).toLocaleDateString() : 'N/A'}
+          </td>
+        </tr>
+      ));
+
+
+
+
+
+
   };
 
   useEffect(() => {
@@ -138,8 +148,20 @@ export const Dashboard = () => {
 
       <section className="bg-white mt-6 p-4 rounded-lg">
         <h2 className="text-xl font-semibold mb-4">Mis contratos vendidos</h2>
+
+        {/* Botón para alternar inactivos */}
+        <button
+          onClick={() => setMostrarInactivos(!mostrarInactivos)}
+          className="mb-4 ml-5 text-blue-600  text-sm font-medium"
+        >
+          {mostrarInactivos ? 'Ocultar inactivos ' : 'Mostrar inactivos '}
+        </button>
+
+
+        {/* Render de tabla o contratos */}
         {renderContractsContent()}
       </section>
     </div>
   );
+
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { useFormik } from 'formik';
 
@@ -10,7 +10,8 @@ export const BaseFormModal = ({
     validationSchema,
     onSubmit,
     children,
-    isEditMode
+    isEditMode,
+    enableReinitialize = false 
 }) => {
     const formik = useFormik({
         initialValues,
@@ -19,6 +20,12 @@ export const BaseFormModal = ({
             await onSubmit(values, { setSubmitting });
         }
     });
+
+    useEffect(() => {
+        if (enableReinitialize) {
+            formik.resetForm({ values: initialValues });
+        }
+    }, [initialValues, enableReinitialize]);
 
     return (
         <Dialog

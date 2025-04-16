@@ -1,4 +1,4 @@
-import React from 'react';
+import { React, useEffect } from 'react';
 import moment from 'moment';
 import * as Yup from 'yup';
 import { ClientService } from '../../../../../services/ClientService';
@@ -83,6 +83,13 @@ const clientFormConfig = {
 export const ClientModal = ({ visible, setVisible, onSuccess, clientToEdit }) => {
     const isEditMode = !!clientToEdit;
 
+
+
+    useEffect(() => {
+        console.log("Client to edit passed to modal:", clientToEdit);
+    }, [clientToEdit]);
+
+
     const handleSubmit = async (values, formik) => {
         try {
             const data = clientFormConfig.prepareData(values);
@@ -116,11 +123,14 @@ export const ClientModal = ({ visible, setVisible, onSuccess, clientToEdit }) =>
             validationSchema={clientFormConfig.validationSchema}
             onSubmit={handleSubmit}
             isEditMode={isEditMode}
+            enableReinitialize={true}
         >
             {(formik) => (
                 <div className="mt-8">
                     <div className="w-full">
                         <TextField formik={formik} fieldName="name" label="Nombre" />
+
+                        
                     </div>
                     <div className='w-full flex flex-col justify-between items-start md:flex-row'>
 
@@ -148,6 +158,7 @@ export const ClientModal = ({ visible, setVisible, onSuccess, clientToEdit }) =>
                         <div className="w-full md:w-[47%] ">
                             <DateField formik={formik} fieldName="birthdate" label="Fecha de nacimiento" />
                         </div>
+
                     </div>
                 </div>
             )}

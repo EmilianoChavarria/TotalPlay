@@ -21,9 +21,16 @@ export const Contracts = () => {
   const menuRef = React.useRef(null);
 
   const [clients, setClients] = useState([]);
-  const [selectedClient, setSelectedClient] = useState(null);
-  const [user, setUser] = useState({});
+  const [selectedClient, setSelectedClient] = useState({});
+  const [user, setUser] = useState();
 
+  const handleCloseContractModal = () => {
+    setVisibleContract(false);
+
+      fetchContractsForClient(user.userId); // Aquí recargas los contratos
+
+  };
+  
   const menuItems = [
     {
       label: 'Agregar dirección',
@@ -39,6 +46,7 @@ export const Contracts = () => {
       command: () => {
         setSelectedClient(user);
         setVisibleG(true);
+
       }
     },
     {
@@ -65,6 +73,13 @@ export const Contracts = () => {
       }
     }
   ];
+
+  useEffect(() => {
+    console.log("Cliente seleccionado: ", selectedClient);
+  }, [selectedClient]);  // Este efecto se ejecutará cada vez que `selectedClient` cambie
+  
+
+
 
   const fetchClients = async () => {
     try {
@@ -108,11 +123,15 @@ export const Contracts = () => {
         try {
           setLoadingContracts(prev => ({ ...prev, [clientId]: true }));
           const response = await ContractService.cancelContract(contractId);
-
+          console.log("id del cliente para eliminar"+clientId);
+          
+         fetchContractsForClient(clientId); 
           handleCancelResponse(response, contractId, clientId);
+        
         } catch (error) {
           handleCancelError(error);
         } finally {
+          fetchClients();
           setLoadingContracts(prev => ({ ...prev, [clientId]: false }));
         }
       },
@@ -128,7 +147,16 @@ export const Contracts = () => {
 
     if (isSuccess) {
       showSuccessAlert(successMessage, () => {
+        console.log("id del cliente para eliminar 2", clientId);
+
+        fetchContractsForClient(clientId); 
+         useEffect(async() => {
+          fetchContractsForClient(clientId); 
+          
+          fetchContractsForClient(clientId); 
+        }, []);  // Este efecto se ejecutará cada vez que `selectedClient` cambie
         updateContractsState(contractId, clientId);
+
       });
     } else {
       showErrorAlert(errorMessage);
@@ -155,7 +183,6 @@ export const Contracts = () => {
     console.error("Error al cancelar el contrato:", error);
     showErrorAlert('Ocurrió un error de conexión con el servidor');
   };
-
 
   const handleClientSave = () => {
     fetchClients();
@@ -247,8 +274,8 @@ export const Contracts = () => {
               <Button
                 tooltip="Cancelar contrato"
                 tooltipOptions={{ position: 'bottom' }}
-                onClick={() => cancelContract(contract.id)}
-              >
+                onClick={() => cancelContract(contract.id, client.id)}
+                >
                 <i className="pi pi-times-circle text-red-500" style={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
               </Button>
             </div>
@@ -257,12 +284,13 @@ export const Contracts = () => {
       </div>
     ));
   };
+  
 
   return (
     <>
       <div className='w-full flex flex-col md:flex-row items-center justify-between'>
         <h2 className='text-2xl font font-semibold whitespace-nowrap'>Gestión de contratos</h2>
-        <button className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition' onClick={() => setVisible(true)}>
+        <button className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition' onClick={() => {setVisible(true); setSelectedClient(null)}}>
           <i className={`pi pi-plus mr-2`}
             style={{ fontSize: '1rem', verticalAlign: 'middle' }}
           />
@@ -309,6 +337,8 @@ export const Contracts = () => {
                           email: client.email,
                           rfc: client.rfc,
                           phone: client.phone,
+                          birthdate: client.birthdate,
+
                         });
                         menuRef.current.toggle(e);
                       }}
@@ -352,10 +382,10 @@ export const Contracts = () => {
           </tbody>
         </table>
       </div>
-      <ClientModal visible={visible} setVisible={setVisible} clientToEdit={selectedClient} onSuccess={handleClientSave} />
+      <ClientModal visible={visible} setVisible={setVisible} onSuccess={handleClientSave} clientToEdit={selectedClient} />
       <AddressModal visibleD={visibleD} setVisibleD={setVisibleD} user={selectedClient} onSuccess={handleClientSave} />
       <AddressManageModals visibleD={visibleG} setVisibleD={setVisibleG} user={user} />
-      <ContractModal user={user} visible={visibleContract} setVisible={setVisibleContract} />
+      <ContractModal user={user} visible={visibleContract} setVisible={handleCloseContractModal} />
     </>
   );
 };

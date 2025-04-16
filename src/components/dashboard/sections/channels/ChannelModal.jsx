@@ -62,6 +62,7 @@ const handleFormSubmit = async (values, channelToEdit, onSuccess, setVisible, fo
     } else if (channelToEdit && !(values.logo instanceof File)) {
         formData.append('keepImage', 'true');
     }
+    
 
     try {
         let response;
