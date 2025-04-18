@@ -54,7 +54,7 @@ export const Reports = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         const [users, contracts, sales, monthlyData] = await Promise.all([
           ReportsService.getTotalUsers(token),
           ReportsService.getTotalContracts(token),
@@ -106,26 +106,24 @@ export const Reports = () => {
 
   return (
     <div className="overflow-x-auto w-full mt-6 p-4">
-      {/* Cards */}
       <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="card bg-white flex flex-col items-center justify-center rounded-xl h-28 border border-gray-200 dark:border-gray-600 shadow-sm">
-          <p className="font-semibold text-gray-700 dark:text-white">Total de clientes</p>
-          <h2 className="font-bold text-[23px] text-gray-900 dark:text-white">{totalUsers}</h2>
-        </div>
+  <div className="card bg-white dark:bg-gray-800 flex flex-col items-center justify-center rounded-xl h-28 border border-gray-200 dark:border-gray-600 shadow-sm">
+    <p className="font-semibold text-gray-700 dark:text-white">Total de clientes</p>
+    <h2 className="font-bold text-[23px] text-gray-900 dark:text-white">{totalUsers}</h2>
+  </div>
 
-        <div className="card bg-white flex flex-col items-center justify-center rounded-xl h-28 border border-gray-200 dark:border-gray-600 shadow-sm">
-          <p className="font-semibold text-gray-700 dark:text-white">Total Contratos</p>
-          <h2 className="font-bold text-[23px] text-blue-500">{totalContracts}</h2>
-        </div>
+  <div className="card bg-white dark:bg-gray-800 flex flex-col items-center justify-center rounded-xl h-28 border border-gray-200 dark:border-gray-600 shadow-sm">
+    <p className="font-semibold text-gray-700 dark:text-white">Total Contratos</p>
+    <h2 className="font-bold text-[23px] text-blue-500">{totalContracts}</h2>
+  </div>
 
-        <div className="card bg-white flex flex-col items-center justify-center rounded-xl h-28 border border-gray-200 dark:border-gray-600 shadow-sm">
-          <p className="font-semibold text-gray-700 dark:text-white">Total Ventas</p>
-          <h2 className="font-bold text-[23px] text-blue-500">${totalSales.toFixed(2)}</h2>
-        </div>
-      </div>
+  <div className="card bg-white dark:bg-gray-800 flex flex-col items-center justify-center rounded-xl h-28 border border-gray-200 dark:border-gray-600 shadow-sm">
+    <p className="font-semibold text-gray-700 dark:text-white">Total Ventas</p>
+    <h2 className="font-bold text-[23px] text-blue-500">${totalSales.toFixed(2)}</h2>
+  </div>
+</div>
 
-      {/* Line Chart */}
-      <div className="h-98 mb-4 rounded-sm bg-gray-50 dark:bg-white-500 p-6">
+      <div className="h-98 mb-4 rounded-sm bg-gray-50 dark:bg-gray-800 p-6">
         <div className="flex flex-col items-start mb-4">
           <p className="font-semibold text-2xl text-gray-800 dark:text-white">Crecimiento de ventas</p>
           <p className="text-gray-500 dark:text-gray-400">Evolución mensual durante el último año</p>
@@ -135,6 +133,7 @@ export const Reports = () => {
           <Line data={lineChartData} options={lineChartOptions} />
         </div>
       </div>
+
     </div>
   );
 };

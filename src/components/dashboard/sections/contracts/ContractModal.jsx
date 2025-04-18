@@ -37,7 +37,8 @@ export const ContractModal = ({ user, visible, setVisible }) => {
         try {
             const response = await SalesPackageService.getAllSalesPackage();
             if (response.status === 'OK') {
-                setPackages(response.data || []);
+                const activos = (response.data || []).filter(pkg => pkg.status === true);
+                setPackages(activos);
             }
         } catch (error) {
             console.error("Error al obtener los paquetes:", error);
@@ -45,7 +46,7 @@ export const ContractModal = ({ user, visible, setVisible }) => {
             setLoading(false);
         }
     };
-
+    
     const handleConfirmContract = async () => {
         if (!selectedAddressId || !selectedPackageId) return;
 

@@ -27,10 +27,10 @@ export const Contracts = () => {
   const handleCloseContractModal = () => {
     setVisibleContract(false);
 
-      fetchContractsForClient(user.userId); // Aquí recargas los contratos
+    fetchContractsForClient(user.userId);
 
   };
-  
+
   const menuItems = [
     {
       label: 'Agregar dirección',
@@ -68,7 +68,6 @@ export const Contracts = () => {
       label: 'Eliminar',
       icon: 'pi pi-trash',
       command: () => {
-        // Aquí puedes agregar la lógica para eliminar el cliente
         deleteClient(user.userId);
       }
     }
@@ -76,8 +75,8 @@ export const Contracts = () => {
 
   useEffect(() => {
     console.log("Cliente seleccionado: ", selectedClient);
-  }, [selectedClient]);  // Este efecto se ejecutará cada vez que `selectedClient` cambie
-  
+  }, [selectedClient]); 
+
 
 
 
@@ -123,11 +122,11 @@ export const Contracts = () => {
         try {
           setLoadingContracts(prev => ({ ...prev, [clientId]: true }));
           const response = await ContractService.cancelContract(contractId);
-          console.log("id del cliente para eliminar"+clientId);
-          
-         fetchContractsForClient(clientId); 
+          console.log("id del cliente para eliminar" + clientId);
+
+          fetchContractsForClient(clientId);
           handleCancelResponse(response, contractId, clientId);
-        
+
         } catch (error) {
           handleCancelError(error);
         } finally {
@@ -139,7 +138,6 @@ export const Contracts = () => {
     );
   };
 
-  // Manejador de respuesta exitosa
   const handleCancelResponse = (response, contractId, clientId) => {
     const isSuccess = response.status === 'OK' || response.success;
     const successMessage = response.message ?? 'Contrato cancelado exitosamente';
@@ -149,12 +147,12 @@ export const Contracts = () => {
       showSuccessAlert(successMessage, () => {
         console.log("id del cliente para eliminar 2", clientId);
 
-        fetchContractsForClient(clientId); 
-         useEffect(async() => {
-          fetchContractsForClient(clientId); 
-          
-          fetchContractsForClient(clientId); 
-        }, []);  // Este efecto se ejecutará cada vez que `selectedClient` cambie
+        fetchContractsForClient(clientId);
+        useEffect(async () => {
+          fetchContractsForClient(clientId);
+
+          fetchContractsForClient(clientId);
+        }, []); 
         updateContractsState(contractId, clientId);
 
       });
@@ -163,7 +161,6 @@ export const Contracts = () => {
     }
   };
 
-  // Actualiza el estado de los contratos
   const updateContractsState = (contractId, clientId) => {
     setClientContracts(prev => {
       const updatedContracts = { ...prev };
@@ -178,7 +175,6 @@ export const Contracts = () => {
     });
   };
 
-  // Manejador de errores
   const handleCancelError = (error) => {
     console.error("Error al cancelar el contrato:", error);
     showErrorAlert('Ocurrió un error de conexión con el servidor');
@@ -248,144 +244,171 @@ export const Contracts = () => {
       );
     }
 
-    return clientContracts[client.id].map((contract) => (
-      <div key={contract.id} className="border-l-4 border-blue-500 pl-4 py-3 shadow-sm">
-        <div className="flex justify-between items-start">
-          <div className="mt-2 text-sm text-gray-500">
-            <p className='text-xl font-bold'>{contract.salesPackageEntity.name}</p>
-            <p><span className="font-medium">Contratado el:</span> {contract.creationDate}</p>
-            <p><span className="font-medium">Dirección:</span> {contract.address.name}
-              <p>{contract.address.street}, #{contract.address.number}, {contract.address.city}, {contract.address.state}, C.P. {contract.address.zipCode}</p>
-            </p>
-          </div>
-          <div className='flex'>
-            <div className='flex flex-col gap-y-2'>
-              <span className={`px-2 py-1 text-xs w-fit font-semibold rounded-full ${contract.status === true
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-                }`}>
-                {contract.status === true ? "Activo" : "Inactivo"}
-              </span>
-              <span className='text-xl font-bold text-blue-500'>
-                ${contract.salesPackageEntity.totalAmount}/mes
-              </span>
+    return clientContracts[client.id] && clientContracts[client.id].length > 0 ? (
+      clientContracts[client.id].map((contract) => (
+        <div key={contract.id} className="border-l-4 border-blue-500 pl-4 py-3 shadow-sm">
+          <div className="flex justify-between items-start">
+            <div className="mt-2 text-sm text-gray-500">
+              <p className='text-xl font-bold'>{contract.salesPackageEntity.name}</p>
+              <p><span className="font-medium">Contratado el:</span> {contract.creationDate}</p>
+              <p><span className="font-medium">Dirección:</span> {contract.address.name}
+                <p>{contract.address.street}, #{contract.address.number}, {contract.address.city}, {contract.address.state}, C.P. {contract.address.zipCode}</p>
+              </p>
             </div>
-            <div className='flex gap-x-2 items-center justify-center ml-4'>
-              <Button
-                tooltip="Cancelar contrato"
-                tooltipOptions={{ position: 'bottom' }}
-                onClick={() => cancelContract(contract.id, client.id)}
+            <div className='flex'>
+              <div className='flex flex-col gap-y-2'>
+                <span className={`px-2 py-1 text-xs w-fit font-semibold rounded-full ${contract.status === true
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+                  }`}>
+                  {contract.status === true ? "Activo" : "Inactivo"}
+                </span>
+                <span className='text-xl font-bold text-blue-500'>
+                  ${contract.salesPackageEntity.totalAmount}/mes
+                </span>
+              </div>
+              <div className='flex gap-x-2 items-center justify-center ml-4'>
+                <Button
+                  tooltip="Cancelar contrato"
+                  tooltipOptions={{ position: 'bottom' }}
+                  onClick={() => cancelContract(contract.id, client.id)}
                 >
-                <i className="pi pi-times-circle text-red-500" style={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
-              </Button>
+                  <i className="pi pi-times-circle text-red-500" style={{ fontSize: '1.2rem', verticalAlign: 'middle' }} />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    ));
+      ))
+    ) : (
+      <div className="alert alert-info">No hay contratos disponibles para este cliente.</div> // Aquí el mensaje de alerta
+    );
+
   };
-  
+
 
   return (
     <>
       <div className='w-full flex flex-col md:flex-row items-center justify-between'>
         <h2 className='text-2xl font font-semibold whitespace-nowrap'>Gestión de contratos</h2>
-        <button className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition' onClick={() => {setVisible(true); setSelectedClient(null)}}>
-          <i className={`pi pi-plus mr-2`}
+        <button
+          className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition'
+          onClick={() => {
+            setVisible(true);
+            setSelectedClient(null);
+          }}
+        >
+          <i
+            className={`pi pi-plus mr-2`}
             style={{ fontSize: '1rem', verticalAlign: 'middle' }}
           />
           Agregar cliente
         </button>
       </div>
 
-      <div className="overflow-x-auto bg-white p-4 rounded-md shadow mt-10">
-        <table className="min-w-full text-sm text-gray-500">
-          <thead className="bg-gray-50">
-            <tr className='text-xs text-gray-700 uppercase'>
-              <th className="px-6 py-3 ">Nombre completo</th>
-              <th className="px-6 py-3 ">Email</th>
-              <th className="px-6 py-3 ">RFC</th>
-              <th className="px-6 py-3 ">Telefono</th>
-              <th className="px-6 py-3 ">Direcciones</th>
-              <th className="px-6 py-3 ">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {clients.map((client) => (
-              <React.Fragment key={client.id}>
-                <tr
-                  className="hover:bg-gray-50 cursor-pointer text-center"
-                  onClick={() => toggleClient(client.id)}
-                >
-                  <td className="px-6 py-4 ">
-                    <div className="font-medium text-gray-900">{client.name} {client.lastName} {client.surname}</div>
-                  </td>
-                  <td className="px-6 py-4">{client.email}</td>
-                  <td className="px-6 py-4">{client.rfc}</td>
-                  <td className="px-6 py-4">{client.phone}</td>
-                  <td className="px-6 py-4">{client.addresses.length}</td>
-                  <td className="px-6 py-4 whitespace-nowrap flex items-center justify-center gap-2">
-                    <button
-                      className="text-white rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setUser({
-                          userId: client.id,
-                          name: client.name,
-                          lastName: client.lastName,
-                          surname: client.surname,
-                          email: client.email,
-                          rfc: client.rfc,
-                          phone: client.phone,
-                          birthdate: client.birthdate,
+      {clients.length === 0 ? (
 
-                        });
-                        menuRef.current.toggle(e);
-                      }}
-                    >
-                      <Menu
-                        model={menuItems}
-                        popup
-                        ref={menuRef}
-                        id="popup_menu"
-                        className="text-sm" />
-                      <i
-                        className={`pi pi-ellipsis-v p-2 rounded-lg text-gray-800 mx-auto`}
-                        style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}
-                        aria-controls="popup_menu"
-                        aria-haspopup
-                      />
-                    </button>
 
-                    <i
-                      className={`pi pi-chevron-down ${expandedClient === client.id ? 'rotate-180' : 'rotate-0'}`}
-                      style={{ fontSize: '0.9rem' }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleClient(client.id);
-                      }}
-                    />
-                  </td>
+        <div className="col-span-full  mt-6">
+          <div className="flex items-center justify-center bg-white border border-grey-500 text-gray-500 text-sm font-medium px-4 py-3 rounded-md shadow-sm">
+            <i className="pi pi-info-circle mr-2" style={{ fontSize: '1rem', color: "grey" }} />
+            No hay clientes disponibles.
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="overflow-x-auto bg-white p-4 rounded-md shadow mt-10">
+            <table className="min-w-full text-sm text-gray-500">
+              <thead className="bg-gray-50">
+                <tr className='text-xs text-gray-700 uppercase'>
+                  <th className="px-6 py-3 ">Nombre completo</th>
+                  <th className="px-6 py-3 ">Email</th>
+                  <th className="px-6 py-3 ">RFC</th>
+                  <th className="px-6 py-3 ">Telefono</th>
+                  <th className="px-6 py-3 ">Direcciones</th>
+                  <th className="px-6 py-3 ">Acciones</th>
                 </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {clients.map((client) => (
+                  <React.Fragment key={client.id}>
+                    <tr
+                      className="hover:bg-gray-50 cursor-pointer text-center"
+                      onClick={() => toggleClient(client.id)}
+                    >
+                      <td className="px-6 py-4 ">
+                        <div className="font-medium text-gray-900">{client.name} {client.lastName} {client.surname}</div>
+                      </td>
+                      <td className="px-6 py-4">{client.email}</td>
+                      <td className="px-6 py-4">{client.rfc}</td>
+                      <td className="px-6 py-4">{client.phone}</td>
+                      <td className="px-6 py-4">{client.addresses.length}</td>
+                      <td className="px-6 py-4 whitespace-nowrap flex items-center justify-center gap-2">
+                        <button
+                          className="text-white rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setUser({
+                              userId: client.id,
+                              name: client.name,
+                              lastName: client.lastName,
+                              surname: client.surname,
+                              email: client.email,
+                              rfc: client.rfc,
+                              phone: client.phone,
+                              birthdate: client.birthdate,
+                            });
+                            menuRef.current.toggle(e);
+                          }}
+                        >
+                          <Menu
+                            model={menuItems}
+                            popup
+                            ref={menuRef}
+                            id="popup_menu"
+                            className="text-sm"
+                          />
+                          <i
+                            className={`pi pi-ellipsis-v p-2 rounded-lg text-gray-800 mx-auto`}
+                            style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}
+                            aria-controls="popup_menu"
+                            aria-haspopup
+                          />
+                        </button>
 
-                {expandedClient === client.id && (
-                  <tr>
-                    <td colSpan="6" className="px-6 py-4">
-                      <div className="space-y-4 pl-8">
-                        {renderClientContracts(client)}
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                        <i
+                          className={`pi pi-chevron-down ${expandedClient === client.id ? 'rotate-180' : 'rotate-0'}`}
+                          style={{ fontSize: '0.9rem' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleClient(client.id);
+                          }}
+                        />
+                      </td>
+                    </tr>
+
+                    {expandedClient === client.id && (
+                      <tr>
+                        <td colSpan="6" className="px-6 py-4">
+                          <div className="space-y-4 pl-8">
+                            {renderClientContracts(client)}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
       <ClientModal visible={visible} setVisible={setVisible} onSuccess={handleClientSave} clientToEdit={selectedClient} />
       <AddressModal visibleD={visibleD} setVisibleD={setVisibleD} user={selectedClient} onSuccess={handleClientSave} />
       <AddressManageModals visibleD={visibleG} setVisibleD={setVisibleG} user={user} />
       <ContractModal user={user} visible={visibleContract} setVisible={handleCloseContractModal} />
     </>
   );
+
 };

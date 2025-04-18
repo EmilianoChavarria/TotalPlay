@@ -1,7 +1,6 @@
 import { Dialog } from 'primereact/dialog';
 import React, { useState, useEffect } from 'react'
 
-// Esto es para el formulario
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { FloatLabel } from 'primereact/floatlabel';
@@ -22,7 +21,6 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
 
   const [channels, setChannels] = useState([]);
 
-  // -----------------------------------------------------------------------------------------------
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCity, setSelectedCity] = useState(null);
@@ -36,19 +34,20 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
     return matchesCategory && matchesSearch;
   });
 
-  // -----------------------------------------------------------------------------------------------
 
 
   const fetchChannels = async () => {
     try {
       const response = await ChannelService.getAllChannels();
       if (response.data && Array.isArray(response.data)) {
+        const activeChannels = response.data.filter(channel => channel.status === true);
+  
         const availableChannels = packageToEdit
-          ? response.data.filter(channel =>
-            !packageToEdit.channels.some(c => c.id === channel.id)
-          )
-          : response.data;
-
+          ? activeChannels.filter(channel =>
+              !packageToEdit.channels.some(c => c.id === channel.id)
+            )
+          : activeChannels;
+  
         setChannels(availableChannels);
       } else {
         setChannels([]);
@@ -58,6 +57,7 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
       setChannels([]);
     }
   };
+  
 
   const fetchCategories = async () => {
     try {
@@ -153,7 +153,6 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
     },
   });
 
-  // Handler para cambios en los inputs
   const handleChange = (fieldName, value) => {
     formik.setFieldValue(fieldName, value);
     formik.setFieldTouched(fieldName, true, false);
@@ -208,7 +207,6 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
             <span className='text-sm font-light'>{selectedChannels.length} Canales seleccionados</span>
           </div>
           <div className='flex justify-between items-start'>
-            {/* Available Channels */}
             <div className='w-[49%] border border-gray-300 rounded-md'>
               <div className='w-full p-4 flex flex-col items-center justify-start gap-x-6 gap-y-2'>
                 <IconField iconPosition="left" className='border border-gray-300 rounded-lg w-full '>
@@ -235,7 +233,6 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
                 <span className='text-sm font-medium text-gray-700'>
                   Canales disponibles
                 </span>
-                {/* Listado de canales */}
                 <div className='py-4 flex flex-col gap-y-2'>
                   {filteredChannels.map(channel => (
                     <div key={channel.id} className='flex justify-between items-center hover:bg-gray-50 py-2 px-1'>
@@ -267,7 +264,6 @@ export const ChannelPackageModal = ({ visible, setVisible, onSuccess, packageToE
               </div>
             </div>
 
-            {/* Selected Channels */}
             <div className='w-[49%] border border-gray-300 rounded-md'>
               <div className='border-b border-gray-300 px-4 py-2 font-semibold text-black'>
                 Canales del paquete

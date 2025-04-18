@@ -16,7 +16,6 @@ export const Login = () => {
     const navigate = useNavigate();
     const [passwordVisible, setPasswordVisible] = useState(false);
 
-    // Esquema de validación con Yup
     const validationSchema = Yup.object().shape({
         email: Yup.string()
             .required("El correo es obligatorio")
@@ -28,12 +27,11 @@ export const Login = () => {
             .required("La contraseña es obligatoria")
             .min(8, "Mínimo 8 caracteres")
             .matches(
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.,:;¿¡\-_+=#~()[\]{}|^<>/\\])[A-Za-z\d@$!%*?&.,:;¿¡\-_+=#~()[\]{}|^<>/\\]{8,}$/,
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.,:;¿¡\-_+#~()[\]{}|^/\\])[A-Za-z\d@$!%*?&.,:;¿¡\-_+#~()[\]{}|^/\\]{8,}$/,
                 "Debe contener al menos una mayúscula, una minúscula, un número y un carácter especial"
             ),
     });
 
-    // Configuración de Formik
     const formik = useFormik({
         initialValues: {
             email: '',
@@ -62,13 +60,11 @@ export const Login = () => {
 
     });
 
-    // Handler para cambios en los inputs
     const handleChange = (fieldName, value) => {
         formik.setFieldValue(fieldName, value);
         formik.setFieldTouched(fieldName, true, false);
     };
 
-    // Alternar visibilidad de la contraseña
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);
     };

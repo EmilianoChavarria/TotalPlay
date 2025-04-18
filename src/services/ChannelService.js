@@ -66,8 +66,25 @@ export const ChannelService = {
                 },
             });
 
-            const data = await response.json();
-            return data;
+           
+            return response;
+        } catch (error) {
+            return error;
+        }
+    },
+
+    activatechannel: async (id) => {
+        try {
+            const response = await fetch(`${BASE_URL}/channel/active/${id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+           
+            return response;
         } catch (error) {
             return error;
         }

@@ -17,12 +17,13 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
     const fetchChannelPackages = async () => {
         try {
             const response = await ChannelPackageService.getAllChannelPackages();
-            console.log(response)
-            setChannelPackages(response.data)
+            const disponibles = response.data.filter(pkg => pkg.status === 'DISPONIBLE');
+            setChannelPackages(disponibles);
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
+    
 
     const validationSchema = Yup.object().shape({
         name: Yup.string()
@@ -38,7 +39,6 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
         ,
     });
 
-    // Configuración de Formik
     const formik = useFormik({
         initialValues: {
             name: '',
@@ -78,7 +78,6 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
         },
     });
 
-    // Handler para cambios en los inputs
     const handleChange = (fieldName, value) => {
         formik.setFieldValue(fieldName, value);
         formik.setFieldTouched(fieldName, true, false);
@@ -118,7 +117,6 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
                 </div>
 
                 <div className={`mt-4 flex flex-col md:flex-row justify-between items-start ${formik.touched.name && formik.errors.name ? 'mt-8' : 'mt-6'}`}>
-                    {/* Campo de precio */}
                     <div className={`w-full md:w-[49%] `}>
                         <FloatLabel >
                             <InputText
@@ -135,7 +133,6 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
                         )}
                     </div>
                     <div className='flex items-center justify-start w-full md:w-[45%] '>
-                        {/* Campo de velocidad */}
                         <div className='mr-2'>
                             <FloatLabel >
                                 <InputText
@@ -156,7 +153,6 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
 
                 </div>
 
-                {/* Sección de elegir paquetes */}
                 <div className='w-full mt-5 flex flex-col'>
                     <div className="flex items-center gap-2 mb-1 text-sm text-gray-850">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-package w-4 h-4" data-id="element-152">
@@ -168,7 +164,6 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
                         Selecciona un paquete de canales
                     </div>
 
-                    {/* Lista de paquetes */}
                     <div className="space-y-3 mt-2">
                         {channelPackages.map(pkg => (
                             <div
@@ -189,9 +184,6 @@ export const SalesPackageModal = ({ visible, setVisible, onSuccess }) => {
                     </div>
                 </div>
 
-
-
-                {/* Botón de guardar */}
                 <div className='mt-8'>
                     <button
                         type="submit"

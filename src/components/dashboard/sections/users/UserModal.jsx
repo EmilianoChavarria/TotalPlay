@@ -9,7 +9,6 @@ import { showErrorAlert, showSuccessAlert } from '../../../CustomAlerts';
 import { ClientService } from '../../../../services/ClientService';
 import moment from 'moment';
 
-// Función helper para manejar las clases de los campos
 const getFieldClasses = (fieldName, formik, fieldType = 'input') => {
     const baseClasses = {
         input: 'min-h-10 pl-4 w-full border',
@@ -23,7 +22,6 @@ const getFieldClasses = (fieldName, formik, fieldType = 'input') => {
     return `${baseClasses[fieldType]} ${errorClasses}`;
 };
 
-// Función para inicializar valores del formulario
 const getInitialValues = (isEditMode, userToEdit) => ({
     firstName: isEditMode ? userToEdit.firstName : '',
     lastName: isEditMode ? userToEdit.lastName : '',
@@ -220,15 +218,14 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
                         )}
                     </div>
                 </div>
-
                 <div className={`${formik.touched.surname && formik.errors.surname ? 'mt-8' : 'mt-7'}`}>
-                    <FloatLabel className='w-full'>
+                    <FloatLabel className="w-full">
                         <InputText
                             id="rfc"
                             name="rfc"
-                            className={getFieldClasses('rfc', formik)}
+                            className={`${getFieldClasses('rfc', formik)} uppercase`} 
                             value={formik.values.rfc}
-                            onChange={(e) => handleChange('rfc', e.target.value)}
+                            onChange={(e) => handleChange('rfc', e.target.value.toUpperCase())} 
                         />
                         <label htmlFor="rfc">RFC</label>
                     </FloatLabel>
@@ -236,6 +233,7 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
                         <div className="text-red-500 text-xs mt-1">{formik.errors.rfc}</div>
                     )}
                 </div>
+
 
                 <div className={`${formik.touched.rfc && formik.errors.rfc ? 'mt-8' : 'mt-7'}`}>
                     <FloatLabel className='w-full'>
@@ -319,7 +317,6 @@ export const UserModal = ({ visible, setVisible, onSuccess, userToEdit }) => {
     );
 };
 
-// Función para preparar los datos del formulario
 const prepareFormData = (values, isEditMode) => {
     const data = {
         ...values,
@@ -333,7 +330,6 @@ const prepareFormData = (values, isEditMode) => {
     return data;
 };
 
-// Función para manejar el envío del formulario
 const handleFormSubmission = async (data, isEditMode, userToEdit, setVisible, formik, onSuccess) => {
     try {
         const response = isEditMode
@@ -344,28 +340,29 @@ const handleFormSubmission = async (data, isEditMode, userToEdit, setVisible, fo
             : await ClientService.saveAgente(data);
 
         handleApiResponse(response, isEditMode, setVisible, formik, onSuccess);
+
     } catch (error) {
         handleApiError(error);
     }
 };
 
-// Manejador de respuesta de la API
 const handleApiResponse = (response, isEditMode, setVisible, formik, onSuccess) => {
-    if (response.status === 'OK' || response.success) {
+    if (response.status === 'OK' || response.success || response.status === "CREATED") {
         setVisible(false);
         formik.resetForm();
         showSuccessAlert(
+
             response.message || (isEditMode ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente'),
             () => onSuccess?.()
         );
     } else {
+        setVisible(false);
         showErrorAlert(
             response.message || (isEditMode ? 'Error al actualizar el usuario' : 'Error al crear el usuario')
         );
     }
 };
 
-// Manejador de errores de la API
 const handleApiError = (error) => {
     console.error("Error al procesar la solicitud:", error);
     showErrorAlert('Ocurrió un error al procesar la solicitud');

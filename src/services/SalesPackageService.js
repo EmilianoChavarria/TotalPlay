@@ -49,6 +49,22 @@ export const SalesPackageService = {
             return error;
         }
     },
+
+    
+    activeChannelPackage: async (id) => {
+        try {
+            const response = await fetch(`${BASE_URL}/salesPackage/active/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return await response.json();
+        } catch (error) {
+            return error;
+        }
+    },
     
 
 }

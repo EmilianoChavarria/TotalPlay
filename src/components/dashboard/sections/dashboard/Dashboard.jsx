@@ -59,7 +59,14 @@ export const Dashboard = () => {
     }
 
     if (contracts.length === 0) {
-      return <p>No se encontraron contratos.</p>;
+      return <>
+        <div className="col-span-full mt-6">
+          <div className="flex items-center justify-center text-gray-500 text-sm font-medium px-4 py-3 ">
+            <i className="pi pi-info-circle mr-2" style={{ fontSize: '1rem', color: "grey" }} />
+            No hay contratos disponibles.
+          </div>
+        </div>
+      </>;
     }
 
     return (
@@ -103,8 +110,8 @@ export const Dashboard = () => {
           <td className="px-6 py-4">${contract.salesPackageEntity?.totalAmount || 'N/A'}/mes</td>
           <td className="px-6 py-4">
             <span className={`px-2 py-1 text-xs font-semibold rounded-full ${contract.status === true
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-red-100 text-red-800'
               }`}>
               {contract.status === true ? 'Activo' : 'Inactivo'}
             </span>
@@ -147,18 +154,22 @@ export const Dashboard = () => {
       </section>
 
       <section className="bg-white mt-6 p-4 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Mis contratos vendidos</h2>
 
-        {/* Botón para alternar inactivos */}
-        <button
-          onClick={() => setMostrarInactivos(!mostrarInactivos)}
-          className="mb-4 ml-5 text-blue-600  text-sm font-medium"
-        >
-          {mostrarInactivos ? 'Ocultar inactivos ' : 'Mostrar inactivos '}
-        </button>
+        {countClients > 0 && (
+          <div>
+
+            <h2 className="text-xl font-semibold mb-4">Mis contratos vendidos</h2>
+            <button
+              onClick={() => setMostrarInactivos(!mostrarInactivos)}
+              className="mb-4 ml-5 text-blue-600 text-sm font-medium"
+            >
+              {mostrarInactivos ? 'Ocultar inactivos ' : 'Mostrar inactivos '}
+            </button>
+          </div>
+
+        )}
 
 
-        {/* Render de tabla o contratos */}
         {renderContractsContent()}
       </section>
     </div>

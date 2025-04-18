@@ -8,6 +8,7 @@ export const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [showingActive, setShowingActive] = useState(true);
 
   useEffect(() => {
     fetchUsers();
@@ -30,7 +31,7 @@ export const Users = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const handleSuccess = () => {
     fetchUsers();
@@ -69,17 +70,19 @@ export const Users = () => {
       );
     }
 
-    if (users.length === 0) {
+    const filtered = users.filter(user => user.status === showingActive); // 👉 Filtrado por estado
+
+    if (filtered.length === 0) {
       return (
         <tr>
           <td colSpan="6" className="text-center py-6 text-gray-500">
-            No se encontraron usuarios.
+            No se encontraron usuarios {showingActive ? 'activos' : 'inactivos'}.
           </td>
         </tr>
       );
     }
 
-    return users.map((user) => (
+    return filtered.map((user) => (
       <tr key={user.id} className="border-b border-gray-200">
         <td className="px-6 py-4">{user.firstName}</td>
         <td className="px-6 py-4">{user.lastName} {user.surname}</td>
@@ -105,16 +108,26 @@ export const Users = () => {
     <>
       <div className='w-full flex flex-col md:flex-row items-center justify-between'>
         <h2 className='text-2xl font-semibold whitespace-nowrap'>Gestión de Usuarios</h2>
-        <button
-          className='w-full mt-4 md:w-fit md:mt-0 bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition'
-          onClick={() => {
-            setSelectedUser(null);
-            setVisible(true);
-          }}
-        >
-          <i className={`pi pi-plus mr-2`} style={{ fontSize: '1rem', verticalAlign: 'middle' }} />
-          Agregar usuario
-        </button>
+        
+        <div className='flex flex-col md:flex-row gap-2 mt-4 md:mt-0'>
+          <button
+            className='bg-gray-500 text-white rounded-lg py-2 px-4 hover:bg-gray-600 transition'
+            onClick={() => setShowingActive(!showingActive)} // 👉 Cambia entre activos e inactivos
+          >
+            {showingActive ? 'Mostrar inactivos' : 'Mostrar activos'}
+          </button>
+
+          <button
+            className='bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition'
+            onClick={() => {
+              setSelectedUser(null);
+              setVisible(true);
+            }}
+          >
+            <i className={`pi pi-plus mr-2`} style={{ fontSize: '1rem', verticalAlign: 'middle' }} />
+            Agregar usuario
+          </button>
+        </div>
       </div>
 
       <div className="mt-6 overflow-x-auto w-full bg-white p-2 rounded lg">
@@ -141,7 +154,6 @@ export const Users = () => {
           setVisible(v);
           if (!v) setSelectedUser(null);
         }}
-
         onSuccess={handleSuccess}
         userToEdit={selectedUser}
       />

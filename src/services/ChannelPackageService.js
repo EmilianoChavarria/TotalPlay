@@ -73,4 +73,20 @@ export const ChannelPackageService = {
         }
     },
 
+    activeChannelPackage: async (id) => {
+        try {
+            const response = await fetch(`${BASE_URL}/channelPackage/active/${id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            return await response.json();
+        } catch (error) {
+            return error;
+        }
+    },
+
 }

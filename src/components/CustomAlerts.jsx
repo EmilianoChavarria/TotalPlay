@@ -5,16 +5,21 @@ export const showSuccessAlert = (message, callback = null) => {
     title: 'Éxito',
     text: message,
     icon: 'success',
-    confirmButtonText: 'Aceptar',
+    showConfirmButton: false,
+    timer: 1000, 
     customClass: {
       container: 'z-9999'
-    }
-  }).then(() => {
-    if (callback && typeof callback === 'function') {
-      callback();
+    },
+    didClose: () => {
+      if (callback && typeof callback === 'function') {
+        callback();
+      }
     }
   });
 };
+
+
+
 
 export const showErrorAlert = (message, callback = null) => {
   Swal.fire({
@@ -35,7 +40,6 @@ export const showErrorAlert = (message, callback = null) => {
 export const showConfirmAlert = (message, confirmCallback, cancelCallback = null) => {
   Swal.fire({
     title: message,
-    text: 'Esta acción no se puede deshacer',
     icon: 'question',
     showCancelButton: true,
     confirmButtonText: 'Sí, continuar',
