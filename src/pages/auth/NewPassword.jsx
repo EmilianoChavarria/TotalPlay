@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
@@ -7,6 +7,9 @@ import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 
 export const NewPassword = () => {
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
@@ -73,22 +76,27 @@ export const NewPassword = () => {
                 </p>
 
                 <form onSubmit={formik.handleSubmit} className='mt-6'>
-
                     {/* Contraseña */}
                     <div className='mb-4'>
                         <label htmlFor='password' className='block text-sm font-medium mb-1'>
                             Nueva contraseña
                         </label>
-                        <InputText
-                            id='password'
-                            name='password'
-                            type='password'
-                            placeholder='********'
-                            className={`w-full border ${formik.touched.password && formik.errors.password ? 'border-red-500' : 'border-gray-200'} min-h-10 pl-4`}
-                            value={formik.values.password}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                        />
+                        <div className='relative'>
+                            <InputText
+                                id='password'
+                                name='password'
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder='********'
+                                className={`w-full border ${formik.touched.password && formik.errors.password ? 'border-red-500' : 'border-gray-200'} min-h-10 pl-4 pr-10`}
+                                value={formik.values.password}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                            />
+                            <i
+                                className={`pi ${showPassword ? 'pi-eye-slash' : 'pi-eye'} absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer`}
+                                onClick={() => setShowPassword(!showPassword)}
+                            />
+                        </div>
                         {formik.touched.password && formik.errors.password && (
                             <small className='text-red-500'>{formik.errors.password}</small>
                         )}
@@ -104,16 +112,22 @@ export const NewPassword = () => {
                         <label htmlFor='confirmPassword' className='block text-sm font-medium mb-1'>
                             Confirmar contraseña
                         </label>
-                        <InputText
-                            id='confirmPassword'
-                            name='confirmPassword'
-                            type='password'
-                            placeholder='********'
-                            className={`w-full border ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'border-red-500' : 'border-gray-200'} min-h-10 pl-4`}
-                            value={formik.values.confirmPassword}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                        />
+                        <div className='relative'>
+                            <InputText
+                                id='confirmPassword'
+                                name='confirmPassword'
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                placeholder='********'
+                                className={`w-full border ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'border-red-500' : 'border-gray-200'} min-h-10 pl-4 pr-10`}
+                                value={formik.values.confirmPassword}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                            />
+                            <i
+                                className={`pi ${showConfirmPassword ? 'pi-eye-slash' : 'pi-eye'} absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer`}
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            />
+                        </div>
                         {formik.touched.confirmPassword && formik.errors.confirmPassword && (
                             <small className='text-red-500'>{formik.errors.confirmPassword}</small>
                         )}
