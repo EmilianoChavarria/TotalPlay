@@ -14,13 +14,14 @@ export const getFieldClasses = (fieldName, formik, fieldType = 'input') => {
 };
 
 export const handleApiResponse = (response, isEditMode, setVisible, formik, onSuccess, entityName) => {
-    if (response.status === 'OK' || response.success) {
+    if (response.status === 'OK' || response.success ||response.status === 'CREATED') {
         setVisible(false);
         showSuccessAlert(
             response.message || (isEditMode ? `${entityName} actualizado exitosamente` : `${entityName} creado exitosamente`),
             () => onSuccess?.()
         );
     } else {
+        setVisible(false);
         showErrorAlert(
             response.message || (isEditMode ? `Error al actualizar el ${entityName}` : `Error al crear el ${entityName}`)
         );

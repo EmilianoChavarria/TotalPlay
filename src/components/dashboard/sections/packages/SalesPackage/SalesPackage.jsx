@@ -14,7 +14,7 @@ export const SalesPackage = () => {
     const [visibleChannel, setVisibleChannel] = useState(false);
     const [salesPackage, setSalesPackage] = useState([]);
     const [showInactive, setShowInactive] = useState(false);
-    const [noInactivePackagesMessage, setNoInactivePackagesMessage] = useState(''); // Nuevo estado para el mensaje
+    const [noInactivePackagesMessage, setNoInactivePackagesMessage] = useState('');
 
     const getSalesPackage = async () => {
         try {
@@ -156,30 +156,37 @@ export const SalesPackage = () => {
             <div className='flex flex-col'>
                 <div className='w-full flex flex-col md:flex-row items-center justify-between gap-4'>
                     <h2 className='text-2xl font-semibold whitespace-nowrap'>Gestión de paquetes de ventas</h2>
-    
+
                     {hasRole('ADMIN') && (
-                        <button
-                            onClick={() => setVisible(true)}
-                            className='w-full md:w-fit bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition'
-                        >
-                            <i className="pi pi-plus mr-2" />
-                            Agregar paquete
-                        </button>
+
+                        <>
+                            <button
+                                onClick={() => setVisible(true)}
+                                className='w-full md:w-fit bg-blue-500 text-white rounded-lg py-2 px-4 hover:bg-blue-600 transition'
+                            >
+                                <i className="pi pi-plus mr-2" />
+                                Agregar paquete
+                            </button>
+
+                            <button
+                                onClick={() => setShowInactive(prev => !prev)}
+                                className={`px-4 py-2 rounded-md border flex items-center gap-2 transition ${showInactive
+                                        ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600'
+                                        : 'bg-gray-500 text-white border-gray-500 hover:bg-gray-600'
+                                    }`}
+                            >
+                                <i className={`pi ${showInactive ? 'pi-check-circle' : 'pi-ban'}`} />
+                                {showInactive ? 'Ver activos' : 'Ver inactivos'}
+                            </button>
+                        </>
+
+
                     )}
-    
-                    <button
-                        onClick={() => setShowInactive(prev => !prev)}
-                        className={`px-4 py-2 rounded-md border flex items-center gap-2 transition ${
-                            showInactive
-                                ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600'
-                                : 'bg-gray-500 text-white border-gray-500 hover:bg-gray-600'
-                        }`}
-                    >
-                        <i className={`pi ${showInactive ? 'pi-check-circle' : 'pi-ban'}`} />
-                        {showInactive ? 'Ver activos' : 'Ver inactivos'}
-                    </button>
+
+
+
                 </div>
-    
+
                 {noInactivePackagesMessage && (
                     <div className="col-span-full mt-6">
                         <div className="flex items-center justify-center bg-white border border-grey-500 text-gray-500 text-sm font-medium px-4 py-3 rounded-md shadow-sm">
@@ -188,7 +195,7 @@ export const SalesPackage = () => {
                         </div>
                     </div>
                 )}
-    
+
                 <section className='grid grid-cols-1 md:grid-cols-3 gap-6 mt-6'>
                     {salesPackage.length === 0 ? (
                         <div className="col-span-full mt-6">
@@ -203,9 +210,8 @@ export const SalesPackage = () => {
                             .map((item) => (
                                 <div
                                     key={item.id}
-                                    className={`bg-white p-6 rounded-lg shadow-sm flex flex-col border-l-4 ${
-                                        item.status ? 'border-blue-500' : 'border-gray-300'
-                                    } ${!item.status ? 'opacity-60' : ''}`}
+                                    className={`bg-white p-6 rounded-lg shadow-sm flex flex-col border-l-4 ${item.status ? 'border-blue-500' : 'border-gray-300'
+                                        } ${!item.status ? 'opacity-60' : ''}`}
                                 >
                                     <div className='flex items-center justify-between'>
                                         <div className='flex items-center justify-start'>
@@ -216,7 +222,7 @@ export const SalesPackage = () => {
                                             <MenuButton item={item} />
                                         )}
                                     </div>
-    
+
                                     <div className='flex items-center justify-between pt-2 pb-4 border-b border-gray-200'>
                                         <div className='flex items-center justify-start'>
                                             <i className="pi pi-wifi mr-2 text-gray-800" style={{ fontSize: '1.2rem' }} />
@@ -224,7 +230,7 @@ export const SalesPackage = () => {
                                         </div>
                                         <span className='text-2xl font-bold text-blue-600'>${item.totalAmount}/mes</span>
                                     </div>
-    
+
                                     {item.channelPackage ? (
                                         <div className='py-3 flex flex-col'>
                                             <div className='mb-2'>
@@ -263,7 +269,7 @@ export const SalesPackage = () => {
                     )}
                 </section>
             </div>
-    
+
             <SalesPackageModal
                 visible={visible}
                 setVisible={setVisible}
@@ -276,6 +282,6 @@ export const SalesPackage = () => {
             />
         </>
     );
-    
+
 
 };

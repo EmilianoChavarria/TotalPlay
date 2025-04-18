@@ -90,17 +90,16 @@ export const ClientModal = ({ visible, setVisible, onSuccess, clientToEdit }) =>
     }, [clientToEdit]);
 
 
+
     const handleSubmit = async (values, formik) => {
         try {
             const data = clientFormConfig.prepareData(values);
-            console.log("Submitting data:", data); // Debugging line
             const response = await clientFormConfig.submitRequest(
                 data,
                 isEditMode,
                 clientToEdit?.userId
             );
-            console.log("API response:", response); // Debugging line
-
+    
             handleApiResponse(
                 response,
                 isEditMode,
@@ -110,9 +109,11 @@ export const ClientModal = ({ visible, setVisible, onSuccess, clientToEdit }) =>
                 clientFormConfig.entityName
             );
         } catch (error) {
-            handleApiError(error);
+            handleApiError(error, setVisible); // <-- aquí
         }
     };
+    
+    
 
     return (
         <BaseFormModal
@@ -168,7 +169,7 @@ export const ClientModal = ({ visible, setVisible, onSuccess, clientToEdit }) =>
 
 
 
-const handleApiError = (error) => {
-    console.error("Error:", error);
-    showErrorAlert('Ocurrió un error al procesar la solicitud');
+const handleApiError = (error,) => {
+    showErrorAlert(error.message);
+  
 };
